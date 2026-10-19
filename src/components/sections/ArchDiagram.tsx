@@ -4,7 +4,7 @@ const NODE_W = 22;
 const NODE_H = 8;
 
 /** Animated architecture mini-diagram on a 100×60 grid; edges flow node → node. */
-export function ArchDiagram({ arch, title }: { arch: Project["arch"]; title: string }) {
+export function ArchDiagram({ arch, title, uid }: { arch: Project["arch"]; title: string; uid: string }) {
   const byId = Object.fromEntries(arch.nodes.map((n) => [n.id, n]));
   const description = arch.edges
     .map((e) => `${byId[e.from]?.label} to ${byId[e.to]?.label}${e.label ? ` (${e.label})` : ""}`)
@@ -15,7 +15,7 @@ export function ArchDiagram({ arch, title }: { arch: Project["arch"]; title: str
       <figcaption className="hud-label mb-2 px-1">Architecture</figcaption>
       <svg viewBox="0 0 100 60" className="h-auto w-full" role="img" aria-label={`${title} architecture: ${description}`}>
         <defs>
-          <marker id={`arrow-${title}`} viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+          <marker id={`arrow-${uid}`} viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
             <path d="M0,0 L6,3 L0,6 Z" fill="#ffb547" />
           </marker>
         </defs>
@@ -44,7 +44,7 @@ export function ArchDiagram({ arch, title }: { arch: Project["arch"]; title: str
                 strokeOpacity="0.8"
                 strokeWidth="0.45"
                 className="arch-edge"
-                markerEnd={`url(#arrow-${title})`}
+                markerEnd={`url(#arrow-${uid})`}
                 vectorEffect="non-scaling-stroke"
               />
               {e.label && (
