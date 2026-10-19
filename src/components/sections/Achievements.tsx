@@ -5,6 +5,7 @@ import { achievements, type Achievement } from "@/data/portfolio";
 import { useInView } from "@/lib/useInView";
 import { playSound } from "@/lib/sound";
 import { SectionHeading } from "@/components/hud/SectionHeading";
+import { Telemetry } from "./Telemetry";
 
 const ICONS: Record<Achievement["icon"], React.ReactNode> = {
   trophy: <path d="M8 4h8v4a4 4 0 0 1-8 0V4Zm0 1H5a3 3 0 0 0 3 4m8-4h3a3 3 0 0 1-3 4m-4 3v4m-3 3h6m-5 0 1-3h2l1 3" />,
@@ -87,6 +88,7 @@ export function Achievements() {
           );
         })}
       </ul>
+      <Telemetry />
     </section>
   );
 }
