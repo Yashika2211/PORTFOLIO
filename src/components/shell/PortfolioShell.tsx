@@ -14,6 +14,7 @@ import { Hero } from "@/components/sections/Hero";
 import { ProjectBriefing } from "@/components/sections/ProjectBriefing";
 import { Projects } from "@/components/sections/Projects";
 import { Skills } from "@/components/sections/Skills";
+import { Stage } from "@/scenes/Stage";
 import { Director } from "@/yashu/Director";
 import { Subtitles } from "@/yashu/ui/Subtitles";
 import { Toasts } from "@/yashu/ui/Toasts";
@@ -32,10 +33,11 @@ export function PortfolioShell() {
           Skip to content
         </a>
         <BootSequence onDone={onBooted} />
+        <Stage ready={ready} />
         <HudFrame />
         <Cursor />
         <CommandBar />
-        <main id="main" className="scanlines">
+        <main id="main" className="scanlines relative">
           <Hero ready={ready} />
           <About />
           <Skills />

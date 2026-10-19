@@ -1,31 +1,24 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import type { CSSProperties } from "react";
 import { assistant, profile } from "@/data/portfolio";
-import { canRender3D, useCapabilities } from "@/lib/capabilities";
 import { ScrambleText } from "@/components/hud/ScrambleText";
 import { StaticCore } from "@/components/fallback/StaticCore";
 import { useYashu } from "@/yashu/store";
 import { scrollToSection } from "@/components/providers/SmoothScroll";
 
-const CoreCanvas = dynamic(() => import("@/components/three/CoreCanvas"), {
-  ssr: false,
-  loading: () => <StaticCore />,
-});
-
 /** Staggered HUD entrance delay; the animation lives in .hud-in (globals.css). */
 const d = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
 
 export function Hero({ ready }: { ready: boolean }) {
-  const caps = useCapabilities();
   const setCommandOpen = useYashu((s) => s.setCommandOpen);
-  const use3D = canRender3D(caps) && !caps.reducedMotion;
+  // The 3D core lives in the shared scene (src/scenes); show the 2D core otherwise.
+  const gl3d = useYashu((s) => s.gl3d);
 
   return (
     <section id="hero" aria-labelledby="hero-title" className="relative flex min-h-[100svh] items-center overflow-hidden pt-24">
       <div className="pointer-events-none absolute inset-0 max-md:opacity-60">
-        {ready && use3D ? <CoreCanvas mobile={caps.mobile} /> : <StaticCore />}
+        {!gl3d && <StaticCore />}
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-8">
