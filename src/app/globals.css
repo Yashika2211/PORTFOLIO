@@ -401,3 +401,17 @@ html.booted .boot-overlay {
 .case-file[data-projecting] .glass {
   background-image: radial-gradient(ellipse 45% 70% at 80% 30%, rgb(0 229 255 / 0.12), transparent 70%);
 }
+
+/* ---------- Pop-out stats ---------- */
+.pop-stage {
+  perspective: 700px;
+}
+.pop-out {
+  animation: pop-out 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0s) both;
+  transform-style: preserve-3d;
+}
+@keyframes pop-out {
+  0% { transform: translateZ(0) scale(1); }
+  35% { transform: translateZ(120px) scale(1.08); box-shadow: 0 30px 60px rgb(0 0 0 / 0.5), 0 0 40px rgb(0 229 255 / 0.35); }
+  100% { transform: translateZ(0) scale(1); }
+}

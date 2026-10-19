@@ -55,13 +55,13 @@ export function Hero({ ready }: { ready: boolean }) {
             </button>
           </div>
 
-          <dl className="hud-in mt-12 grid max-w-lg grid-cols-3 gap-3 font-mono text-xs" style={d(0.85)}>
+          <dl className="hud-in pop-stage mt-12 grid max-w-lg grid-cols-3 gap-3 font-mono text-xs" style={d(0.85)}>
             {[
               ["LOC", profile.location],
               ["EDU", "SRM AP · CSE (DS)"],
               ["CGPA", profile.education.cgpa],
-            ].map(([k, v]) => (
-              <div key={k} className="glass px-3 py-2">
+            ].map(([k, v], i) => (
+              <div key={k} className={`glass px-3 py-2 ${ready ? "pop-out" : ""}`} style={d(1.4 + i * 0.15)}>
                 <dt className="text-cyan">{k}</dt>
                 <dd className="mt-0.5 text-ink/90">{v}</dd>
               </div>

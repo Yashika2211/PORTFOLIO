@@ -14,7 +14,7 @@ const IdCardView = dynamic(() => import("@/scenes/views/IdCardView"), { ssr: fal
 const R = 42;
 const C = 2 * Math.PI * R;
 
-function Gauge({ stat, start }: { stat: Stat; start: boolean }) {
+function Gauge({ stat, start, index }: { stat: Stat; start: boolean; index: number }) {
   const n = useCountUp(stat.value, start);
   // Ring fill is decorative except for true ratios (F0.5 score, CGPA out of 10).
   const ratio = stat.value <= 1 ? stat.value : stat.suffix === "/10" ? stat.value / 10 : 1;
@@ -22,7 +22,7 @@ function Gauge({ stat, start }: { stat: Stat; start: boolean }) {
   const shown = stat.decimals ? n.toFixed(stat.decimals) : Math.round(n).toString();
 
   return (
-    <li className="glass flex flex-col items-center p-4 text-center">
+    <li className={`glass flex flex-col items-center p-4 text-center ${start ? "pop-out" : ""}`} style={{ "--d": `${0.2 + index * 0.12}s` } as React.CSSProperties}>
       <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90" aria-hidden="true">
         <circle cx="50" cy="50" r={R} fill="none" stroke="rgb(0 229 255 / 0.12)" strokeWidth="6" />
         <circle
@@ -128,9 +128,9 @@ export function About() {
 
       <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,28rem)_1fr]">
         <IdCard />
-        <ul ref={ref} className="grid grid-cols-2 gap-4 sm:grid-cols-3" aria-label="Key stats">
-          {gauges.map((s) => (
-            <Gauge key={s.id} stat={s} start={inView} />
+        <ul ref={ref} className="pop-stage grid grid-cols-2 gap-4 sm:grid-cols-3" aria-label="Key stats">
+          {gauges.map((s, i) => (
+            <Gauge key={s.id} stat={s} start={inView} index={i} />
           ))}
         </ul>
       </div>
