@@ -10,11 +10,11 @@ gsap.registerPlugin(ScrollTrigger);
 let lenis: Lenis | null = null;
 
 /** Scroll to a section by id; uses Lenis when active, native otherwise. */
-export function scrollToSection(id: string) {
+export function scrollToSection(id: string, opts: { duration?: number; immediate?: boolean } = {}) {
   const el = document.getElementById(id);
   if (!el) return;
-  if (lenis) lenis.scrollTo(el, { offset: -8, duration: 1.4 });
-  else el.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (lenis) lenis.scrollTo(el, { offset: -8, duration: opts.duration ?? 1.4, immediate: opts.immediate });
+  else el.scrollIntoView({ behavior: opts.immediate ? "auto" : "smooth", block: "start" });
   // Move focus for keyboard / screen-reader users without a second jump.
   el.setAttribute("tabindex", "-1");
   el.focus({ preventScroll: true });
