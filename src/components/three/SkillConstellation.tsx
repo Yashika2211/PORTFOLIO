@@ -104,7 +104,7 @@ export default function SkillConstellation({ active, onHover, mobile, running }:
     <Canvas
       frameloop={running ? "always" : "never"}
       dpr={[1, mobile ? 1.5 : 2]}
-      camera={{ position: [0, 1.2, mobile ? 11 : 9], fov: 45 }}
+      camera={{ position: [0, 1.2, mobile ? 12 : 11], fov: 45 }}
       gl={{ antialias: true, alpha: true }}
       onPointerMissed={() => onHover(null)}
     >

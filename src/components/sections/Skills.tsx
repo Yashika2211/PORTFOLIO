@@ -41,7 +41,7 @@ export function Skills() {
   return (
     <section id="skills" aria-labelledby="skills-title" className="relative mx-auto max-w-7xl px-4 py-28 sm:px-8">
       <SectionHeading id="skills-title" index="02" kicker="Capability matrix" title="Skills">
-        Hover or focus any skill to light up the case files that use it.
+        Hover, tap or focus any skill to light up the case files that use it. The number on each chip is how many featured projects use it.
       </SectionHeading>
 
       <div className="grid items-start gap-10 lg:grid-cols-2">
