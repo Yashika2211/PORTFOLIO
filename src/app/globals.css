@@ -345,9 +345,9 @@ html.booted .boot-overlay {
 }
 
 /* Hologram materialize: build up from scan lines bottom → top with an RGB split. */
+/* Opacity only: a fully clipped element never reports as intersecting. */
 .glass[data-mat="out"] {
   opacity: 0;
-  clip-path: inset(100% 0 0 0);
 }
 .glass[data-mat="in"] {
   animation: materialize 0.75s cubic-bezier(0.3, 0.7, 0.2, 1) both;
@@ -370,9 +370,6 @@ html.booted .boot-overlay {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .glass[data-mat="out"] {
-    clip-path: none;
-  }
   .glass[data-mat="in"] {
     animation: fade-in 0.2s ease both !important;
     animation-duration: 0.2s !important;
