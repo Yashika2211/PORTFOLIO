@@ -25,7 +25,7 @@ type HudState = {
 
 const HudContext = createContext<HudState | null>(null);
 
-const PREFS_KEY = "yasha:prefs:v1";
+const PREFS_KEY = "yashu:prefs:v1";
 
 function loadPrefs(): { voice: boolean; sound: boolean } {
   try {

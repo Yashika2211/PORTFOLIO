@@ -10,7 +10,7 @@ export type GitHubSnapshot = {
   source: "live" | "cache" | "fallback";
 };
 
-const CACHE_KEY = "yasha:github:v1";
+const CACHE_KEY = "yashu:github:v1";
 const TTL_MS = 30 * 60 * 1000;
 
 function readCache(): { at: number; data: Omit<GitHubSnapshot, "source"> } | null {

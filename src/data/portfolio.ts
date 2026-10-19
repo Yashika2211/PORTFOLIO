@@ -93,10 +93,10 @@ export const profile = {
 };
 
 export const assistant = {
-  name: "Y.A.S.H.A.",
-  expansion: "Yashika's Autonomous Systems & Hacks Assistant",
+  name: "Y.A.S.H.U.",
+  expansion: "Yashika's Autonomous Systems & Hacks Unit",
   bootLines: [
-    "Initializing Y.A.S.H.A. …",
+    "Initializing Y.A.S.H.U. …",
     "loading neural modules …",
     "mounting case files [5] …",
     "7 hackathons indexed …",

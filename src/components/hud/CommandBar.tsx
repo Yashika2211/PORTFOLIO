@@ -10,7 +10,7 @@ import { listenOnce, speak, speechInputSupported } from "@/lib/speech";
 import { coreSignal, useHud } from "@/components/providers/HudProvider";
 import { scrollToSection } from "@/components/providers/SmoothScroll";
 
-type LogEntry = { who: "you" | "yasha"; text: string };
+type LogEntry = { who: "you" | "yashu"; text: string };
 
 function pulseCore(ms = 900) {
   coreSignal.speaking = true;
@@ -22,7 +22,7 @@ export function CommandBar() {
   const router = useRouter();
   const [input, setInput] = useState("");
   const [log, setLog] = useState<LogEntry[]>([
-    { who: "yasha", text: `${assistant.name} online. Ask me to show projects, open a case file, or fetch the resume.` },
+    { who: "yashu", text: `${assistant.name} online. Ask me to show projects, open a case file, or fetch the resume.` },
   ]);
   const [listening, setListening] = useState(false);
   const [micOk, setMicOk] = useState(false);
@@ -92,7 +92,7 @@ export function CommandBar() {
       setInput("");
       setLog((l) => [...l, { who: "you", text: q }]);
       const reply = await resolveCommand(q);
-      setLog((l) => [...l.slice(-8), { who: "yasha", text: reply.text }]);
+      setLog((l) => [...l.slice(-8), { who: "yashu", text: reply.text }]);
       playSound("click");
       if (voice) {
         speak(reply.text, {
@@ -117,7 +117,7 @@ export function CommandBar() {
     setListening(true);
     promise
       .then((t) => void submit(t))
-      .catch(() => setLog((l) => [...l, { who: "yasha", text: "Didn't hear anything — try typing instead." }]))
+      .catch(() => setLog((l) => [...l, { who: "yashu", text: "Didn't hear anything — try typing instead." }]))
       .finally(() => setListening(false));
   }, [listening, submit]);
 
@@ -178,7 +178,7 @@ export function CommandBar() {
               <div className="max-h-64 space-y-2 overflow-y-auto px-4 py-3 font-mono text-sm" aria-live="polite">
                 {log.map((m, i) => (
                   <p key={i} className={m.who === "you" ? "text-amber" : "text-ink"}>
-                    <span className="mr-2 text-muted">{m.who === "you" ? "you >" : "yasha >"}</span>
+                    <span className="mr-2 text-muted">{m.who === "you" ? "you >" : "yashu >"}</span>
                     {m.text}
                   </p>
                 ))}
@@ -191,11 +191,11 @@ export function CommandBar() {
                   void submit(input);
                 }}
               >
-                <label htmlFor="yasha-input" className="sr-only">
+                <label htmlFor="yashu-input" className="sr-only">
                   Command
                 </label>
                 <input
-                  id="yasha-input"
+                  id="yashu-input"
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}

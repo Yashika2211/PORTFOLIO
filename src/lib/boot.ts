@@ -1,4 +1,4 @@
-export const BOOT_KEY = "yasha:booted:v1";
+export const BOOT_KEY = "yashu:booted:v1";
 
 /**
  * Runs before first paint (inlined in <head>) so returning visitors and

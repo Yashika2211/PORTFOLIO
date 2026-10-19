@@ -61,7 +61,7 @@ export default function OgImage() {
 
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", maxWidth: 720 }}>
           <div style={{ fontSize: 22, letterSpacing: 8, color: "#00e5ff", display: "flex" }}>
-            Y.A.S.H.A. // PORTFOLIO ONLINE
+            Y.A.S.H.U. // PORTFOLIO ONLINE
           </div>
           <div style={{ fontSize: 86, fontWeight: 800, marginTop: 18, letterSpacing: 2, display: "flex" }}>
             {profile.name}

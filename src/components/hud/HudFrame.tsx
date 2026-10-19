@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { profile, sections } from "@/data/portfolio";
+import { assistant, profile, sections } from "@/data/portfolio";
 import { useGitHub } from "@/lib/github";
 import { playSound } from "@/lib/sound";
 import { speechOutputSupported } from "@/lib/speech";
@@ -115,7 +115,7 @@ export function HudFrame() {
             className="font-display text-sm font-bold tracking-[0.25em] text-cyan text-glow"
             aria-label="Back to top"
           >
-            Y.A.S.H.A.
+            {assistant.name}
           </button>
 
           <nav aria-label="Sections" className="hidden lg:block">
