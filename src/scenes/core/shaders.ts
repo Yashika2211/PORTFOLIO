@@ -50,14 +50,18 @@ float snoise(vec3 v){
 export const coreVertex = /* glsl */ `
 uniform float uTime;
 uniform float uEnergy;
+uniform float uListen;
+uniform float uMic;
 varying vec3 vNormal;
 varying vec3 vView;
 varying float vNoise;
 ${noise}
 void main(){
-  float n = snoise(position * 1.6 + vec3(uTime * 0.35));
+  float n = snoise(position * 1.6 + vec3(uTime * (0.35 + uEnergy * 0.9)));
   vNoise = n;
-  vec3 displaced = position + normal * n * (0.08 + uEnergy * 0.12);
+  // Voice drives noise amplitude; the mic adds a horizontal waveform ripple.
+  float ripple = sin(position.y * 14.0 - uTime * 9.0) * uMic * uListen * 0.07;
+  vec3 displaced = position * (1.0 - uListen * 0.08) + normal * (n * (0.07 + uEnergy * 0.2) + ripple);
   vec4 mv = modelViewMatrix * vec4(displaced, 1.0);
   vNormal = normalize(normalMatrix * normal);
   vView = normalize(-mv.xyz);
@@ -68,6 +72,7 @@ void main(){
 export const coreFragment = /* glsl */ `
 uniform float uTime;
 uniform float uEnergy;
+uniform float uListen;
 uniform vec3 uColor;
 uniform vec3 uAccent;
 varying vec3 vNormal;
@@ -76,9 +81,11 @@ varying float vNoise;
 void main(){
   float fresnel = pow(1.0 - max(dot(vNormal, vView), 0.0), 2.4);
   float bands = 0.5 + 0.5 * sin(vNoise * 9.0 + uTime * 2.0);
-  vec3 col = mix(uColor * 0.18, uColor, fresnel);
+  // Listening turns the core amber.
+  vec3 base = mix(uColor, uAccent, uListen);
+  vec3 col = mix(base * 0.18, base, fresnel);
   col += uAccent * pow(bands, 6.0) * 0.35 * (0.4 + uEnergy);
-  col += uColor * fresnel * (0.6 + uEnergy * 1.2);
+  col += base * fresnel * (0.6 + uEnergy * 1.6);
   float alpha = clamp(0.25 + fresnel * 0.9, 0.0, 1.0);
   gl_FragColor = vec4(col, alpha);
 }
