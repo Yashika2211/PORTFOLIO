@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { coreSignal } from "@/components/providers/HudProvider";
+import { signals as coreSignal } from "@/yashu/signals";
 
 const INTERACTIVE = "a, button, [role='button'], input, textarea, select, [data-magnetic]";
 

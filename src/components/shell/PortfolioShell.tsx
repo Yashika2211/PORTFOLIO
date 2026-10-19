@@ -5,7 +5,6 @@ import { BootSequence } from "@/components/hud/BootSequence";
 import { CommandBar } from "@/components/hud/CommandBar";
 import { Cursor } from "@/components/hud/Cursor";
 import { HudFrame } from "@/components/hud/HudFrame";
-import { HudProvider } from "@/components/providers/HudProvider";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { About } from "@/components/sections/About";
 import { Achievements } from "@/components/sections/Achievements";
@@ -15,13 +14,15 @@ import { Hero } from "@/components/sections/Hero";
 import { ProjectBriefing } from "@/components/sections/ProjectBriefing";
 import { Projects } from "@/components/sections/Projects";
 import { Skills } from "@/components/sections/Skills";
+import { YashuBridge } from "@/yashu/YashuBridge";
 
 export function PortfolioShell() {
   const [ready, setReady] = useState(false);
   const onBooted = useCallback(() => setReady(true), []);
 
   return (
-    <HudProvider>
+    <>
+      <YashuBridge />
       <SmoothScroll>
         <a href="#main" className="skip-link">
           Skip to content
@@ -41,6 +42,6 @@ export function PortfolioShell() {
         </main>
         <ProjectBriefing />
       </SmoothScroll>
-    </HudProvider>
+    </>
   );
 }

@@ -7,13 +7,14 @@ import { useRef } from "react";
 import { projects, type Project } from "@/data/portfolio";
 import { playSound } from "@/lib/sound";
 import { SectionHeading } from "@/components/hud/SectionHeading";
-import { useHud } from "@/components/providers/HudProvider";
+import { useShallow } from "zustand/react/shallow";
+import { useYashu } from "@/yashu/store";
 import { Lab } from "./Lab";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 function CaseFile({ project, index }: { project: Project; index: number }) {
-  const { setOpenProject, activeSkill } = useHud();
+  const { openCaseFile, activeSkill } = useYashu(useShallow((s) => ({ openCaseFile: s.openCaseFile, activeSkill: s.activeSkill })));
   const tilt = useRef<HTMLDivElement>(null);
   const related = activeSkill ? project.skills.includes(activeSkill) : null;
   const headline = project.metrics[0];
@@ -35,7 +36,10 @@ function CaseFile({ project, index }: { project: Project; index: number }) {
       <div ref={tilt} className="transition-transform duration-300 ease-out [transform-style:preserve-3d]">
         <button
           type="button"
-          onClick={() => setOpenProject(project.slug)}
+          onClick={(e) => {
+            const r = e.currentTarget.getBoundingClientRect();
+            openCaseFile(project.slug, { x: r.left, y: r.top, w: r.width, h: r.height });
+          }}
           onPointerMove={onMove}
           onPointerLeave={onLeave}
           onMouseEnter={() => playSound("hover")}

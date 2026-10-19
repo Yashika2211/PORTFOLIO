@@ -4,7 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { projects } from "@/data/portfolio";
 import { playSound } from "@/lib/sound";
-import { useHud } from "@/components/providers/HudProvider";
+import { useShallow } from "zustand/react/shallow";
+import { useYashu } from "@/yashu/store";
 import { setScrollLocked } from "@/components/providers/SmoothScroll";
 import { ArchDiagram } from "./ArchDiagram";
 import { FanChart } from "./FanChart";
@@ -21,7 +22,7 @@ function Block({ n, label, children }: { n: string; label: string; children: Rea
 }
 
 export function ProjectBriefing() {
-  const { openProject, setOpenProject } = useHud();
+  const { openProject, closeCaseFile } = useYashu(useShallow((s) => ({ openProject: s.openProject, closeCaseFile: s.closeCaseFile })));
   const project = projects.find((p) => p.slug === openProject) ?? null;
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -35,7 +36,7 @@ export function ProjectBriefing() {
     window.setTimeout(() => closeRef.current?.focus(), 50);
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpenProject(null);
+      if (e.key === "Escape") closeCaseFile();
       // Minimal focus trap: keep Tab inside the dialog.
       if (e.key === "Tab" && dialogRef.current) {
         const f = dialogRef.current.querySelectorAll<HTMLElement>("a[href], button:not([disabled])");
@@ -58,7 +59,7 @@ export function ProjectBriefing() {
       playSound("close");
       opener.current?.focus?.();
     };
-  }, [project, setOpenProject]);
+  }, [project, closeCaseFile]);
 
   return (
     <AnimatePresence>
@@ -70,7 +71,7 @@ export function ProjectBriefing() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onMouseDown={(e) => e.target === e.currentTarget && setOpenProject(null)}
+          onMouseDown={(e) => e.target === e.currentTarget && closeCaseFile()}
         >
           <motion.div
             ref={dialogRef}
@@ -96,7 +97,7 @@ export function ProjectBriefing() {
               <button
                 ref={closeRef}
                 type="button"
-                onClick={() => setOpenProject(null)}
+                onClick={() => closeCaseFile()}
                 className="shrink-0 rounded-md border border-cyan/40 px-3 py-2 font-mono text-xs text-muted transition hover:border-cyan hover:text-ink"
                 aria-label="Close briefing"
               >

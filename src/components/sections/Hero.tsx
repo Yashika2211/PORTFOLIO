@@ -6,7 +6,7 @@ import { assistant, profile } from "@/data/portfolio";
 import { canRender3D, useCapabilities } from "@/lib/capabilities";
 import { ScrambleText } from "@/components/hud/ScrambleText";
 import { StaticCore } from "@/components/fallback/StaticCore";
-import { useHud } from "@/components/providers/HudProvider";
+import { useYashu } from "@/yashu/store";
 import { scrollToSection } from "@/components/providers/SmoothScroll";
 
 const CoreCanvas = dynamic(() => import("@/components/three/CoreCanvas"), {
@@ -19,7 +19,7 @@ const d = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
 
 export function Hero({ ready }: { ready: boolean }) {
   const caps = useCapabilities();
-  const { setCommandOpen } = useHud();
+  const setCommandOpen = useYashu((s) => s.setCommandOpen);
   const use3D = canRender3D(caps) && !caps.reducedMotion;
 
   return (

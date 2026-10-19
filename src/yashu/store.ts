@@ -112,7 +112,8 @@ export const useYashu = create<State & Actions>()(
     }),
     {
       name: "yashu:state:v1",
-      storage: createJSONStorage(() => localStorage),
+      // `window.` keeps the server (Node has its own global localStorage) from touching storage.
+      storage: createJSONStorage(() => window.localStorage),
       // Rehydrated manually after mount so SSR markup matches the first client render.
       skipHydration: true,
       partialize: (s) => ({

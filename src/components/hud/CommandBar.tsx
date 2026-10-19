@@ -7,7 +7,9 @@ import { assistant } from "@/data/portfolio";
 import { resolveCommand, SUGGESTIONS, type Action } from "@/lib/assistant";
 import { playSound } from "@/lib/sound";
 import { listenOnce, speak, speechInputSupported } from "@/lib/speech";
-import { coreSignal, useHud } from "@/components/providers/HudProvider";
+import { useShallow } from "zustand/react/shallow";
+import { useYashu } from "@/yashu/store";
+import { signals as coreSignal } from "@/yashu/signals";
 import { scrollToSection } from "@/components/providers/SmoothScroll";
 
 type LogEntry = { who: "you" | "yashu"; text: string };
@@ -18,7 +20,10 @@ function pulseCore(ms = 900) {
 }
 
 export function CommandBar() {
-  const { commandOpen, setCommandOpen, setOpenProject, voice } = useHud();
+  const { commandOpen, setCommandOpen, openCaseFile, voice } = useYashu(
+    useShallow((s) => ({ commandOpen: s.commandOpen, setCommandOpen: s.setCommandOpen, openCaseFile: s.openCaseFile, voice: s.voice })),
+  );
+  const setOpenProject = (slug: string) => openCaseFile(slug);
   const router = useRouter();
   const [input, setInput] = useState("");
   const [log, setLog] = useState<LogEntry[]>([
@@ -82,7 +87,7 @@ export function CommandBar() {
           break;
       }
     },
-    [router, setCommandOpen, setOpenProject],
+    [router, setCommandOpen, openCaseFile],
   );
 
   const submit = useCallback(

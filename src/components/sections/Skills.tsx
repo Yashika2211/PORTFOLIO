@@ -6,7 +6,8 @@ import { awsServices, projects, skillGroups } from "@/data/portfolio";
 import { canRender3D, useCapabilities } from "@/lib/capabilities";
 import { playSound } from "@/lib/sound";
 import { SectionHeading } from "@/components/hud/SectionHeading";
-import { useHud } from "@/components/providers/HudProvider";
+import { useShallow } from "zustand/react/shallow";
+import { useYashu } from "@/yashu/store";
 
 const SkillConstellation = dynamic(() => import("@/components/three/SkillConstellation"), { ssr: false });
 
@@ -33,7 +34,7 @@ function useVisibility<T extends Element>() {
 
 export function Skills() {
   const caps = useCapabilities();
-  const { activeSkill, setActiveSkill } = useHud();
+  const { activeSkill, setActiveSkill } = useYashu(useShallow((s) => ({ activeSkill: s.activeSkill, setActiveSkill: s.setActiveSkill })));
   const { ref, mounted, onScreen } = useVisibility<HTMLDivElement>();
   const usedIn = activeSkill ? projects.filter((p) => p.skills.includes(activeSkill)) : [];
   const show3D = canRender3D(caps) && !caps.reducedMotion;

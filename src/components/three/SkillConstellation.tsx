@@ -5,7 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { skillGroups } from "@/data/portfolio";
-import { coreSignal } from "@/components/providers/HudProvider";
+import { signals as coreSignal } from "@/yashu/signals";
 
 type Props = {
   active: string | null;

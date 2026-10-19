@@ -6,7 +6,8 @@ import { assistant, profile, sections } from "@/data/portfolio";
 import { useGitHub } from "@/lib/github";
 import { playSound } from "@/lib/sound";
 import { speechOutputSupported } from "@/lib/speech";
-import { useHud } from "@/components/providers/HudProvider";
+import { useShallow } from "zustand/react/shallow";
+import { useYashu } from "@/yashu/store";
 import { scrollToSection } from "@/components/providers/SmoothScroll";
 
 function Corner({ className }: { className: string }) {
@@ -88,7 +89,9 @@ export function HudFrame() {
   const time = useClock();
   const { pct, active } = useScrollProgress();
   const gh = useGitHub();
-  const { voice, sound, toggleVoice, toggleSound, setCommandOpen } = useHud();
+  const { voice, sound, setVoice, toggleSound, setCommandOpen } = useYashu(
+    useShallow((s) => ({ voice: s.voice, sound: s.sound, setVoice: s.setVoice, toggleSound: s.toggleSound, setCommandOpen: s.setCommandOpen })),
+  );
   const [ttsOk, setTtsOk] = useState(true);
   useEffect(() => setTtsOk(speechOutputSupported()), []);
 
@@ -141,7 +144,7 @@ export function HudFrame() {
 
           <div className="flex items-center gap-2">
             <div className="hidden items-center gap-2 md:flex">
-              <Toggle on={voice} label="Voice" onClick={toggleVoice} disabled={!ttsOk} />
+              <Toggle on={voice === true} label="Voice" onClick={() => setVoice(voice !== true)} disabled={!ttsOk} />
               <Toggle on={sound} label="SFX" onClick={toggleSound} />
             </div>
             <button

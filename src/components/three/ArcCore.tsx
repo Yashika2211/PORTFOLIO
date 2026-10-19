@@ -3,7 +3,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { coreSignal } from "@/components/providers/HudProvider";
+import { signals as coreSignal } from "@/yashu/signals";
 import { coreFragment, coreVertex } from "./shaders";
 
 const CYAN = new THREE.Color("#00e5ff");
