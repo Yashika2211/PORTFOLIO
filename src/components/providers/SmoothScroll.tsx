@@ -20,6 +20,12 @@ export function scrollToSection(id: string) {
   el.focus({ preventScroll: true });
 }
 
+/** Scroll an arbitrary element into view (used by the guided tour). */
+export function scrollToElement(el: HTMLElement, duration = 1.6, offset = -120) {
+  if (lenis) lenis.scrollTo(el, { offset, duration });
+  else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + offset, behavior: "smooth" });
+}
+
 /** Freeze page scroll while a modal is open. */
 export function setScrollLocked(locked: boolean) {
   if (lenis) {
