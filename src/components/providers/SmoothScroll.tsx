@@ -20,6 +20,15 @@ export function scrollToSection(id: string) {
   el.focus({ preventScroll: true });
 }
 
+/** Freeze page scroll while a modal is open. */
+export function setScrollLocked(locked: boolean) {
+  if (lenis) {
+    if (locked) lenis.stop();
+    else lenis.start();
+  }
+  document.documentElement.style.overflow = locked ? "hidden" : "";
+}
+
 export function SmoothScroll({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;

@@ -45,7 +45,6 @@ export function ArchDiagram({ arch, title, uid }: { arch: Project["arch"]; title
                 strokeWidth="0.45"
                 className="arch-edge"
                 markerEnd={`url(#arrow-${uid})`}
-                vectorEffect="non-scaling-stroke"
               />
               {e.label && (
                 <text x={(x1 + x2) / 2} y={(y1 + y2) / 2 - 1.2} textAnchor="middle" fontSize="2.6" className="fill-muted font-mono">
