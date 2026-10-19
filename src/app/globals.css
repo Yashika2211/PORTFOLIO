@@ -431,3 +431,27 @@ html.booted .boot-overlay {
   background-repeat: no-repeat;
   filter: drop-shadow(0 0 6px rgb(255 181 71 / 0.7));
 }
+
+/* ---------- Easter eggs ---------- */
+html[data-overdrive] {
+  --color-cyan: #ffd36b;
+  --color-cyan-dim: #c99a2e;
+  --color-mint: #ffe6a8;
+}
+.celebrate-bit {
+  animation: celebrate-burst 1.6s cubic-bezier(0.1, 0.7, 0.3, 1) both;
+}
+@keyframes celebrate-burst {
+  from { transform: translate(0, 0) rotate(0); opacity: 1; }
+  to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; }
+}
+.celebrate-text {
+  text-shadow: 0 0 30px rgb(255 181 71 / 0.8);
+  animation: celebrate-text 1.8s ease both;
+}
+@keyframes celebrate-text {
+  0% { opacity: 0; transform: scale(0.6); letter-spacing: 0.6em; }
+  25% { opacity: 1; transform: scale(1); letter-spacing: 0.2em; }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.05); }
+}
