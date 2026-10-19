@@ -16,6 +16,7 @@ import { Projects } from "@/components/sections/Projects";
 import { Skills } from "@/components/sections/Skills";
 import { Stage } from "@/scenes/Stage";
 import { Director } from "@/yashu/Director";
+import { Transitions } from "@/yashu/transitions/Transitions";
 import { Subtitles } from "@/yashu/ui/Subtitles";
 import { Toasts } from "@/yashu/ui/Toasts";
 import { VoicePrompt } from "@/yashu/ui/VoicePrompt";
@@ -48,6 +49,7 @@ export function PortfolioShell() {
         </main>
         <ProjectBriefing />
         <Director ready={ready} />
+        <Transitions />
         <VoicePrompt ready={ready} />
         <Subtitles />
         <Toasts />

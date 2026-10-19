@@ -315,3 +315,70 @@ html.booted .boot-overlay {
 @keyframes flow {
   to { stroke-dashoffset: -16; }
 }
+
+/* ---------- Transitions ---------- */
+.warp-streaks {
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%, rgb(0 229 255 / 0) 0deg 2.2deg, rgb(0 229 255 / 0.35) 2.4deg, rgb(0 229 255 / 0) 2.8deg 6deg),
+    radial-gradient(circle at 50% 50%, rgb(5 7 13 / 0) 0 12%, rgb(5 7 13 / 0.35) 60%);
+  mask-image: radial-gradient(circle at 50% 50%, transparent 10%, black 55%);
+}
+
+.data-col {
+  margin: 0;
+  transform: translateY(-110%);
+  text-shadow: 0 0 8px rgb(0 229 255 / 0.8);
+  animation: data-fall 1.1s cubic-bezier(0.5, 0, 0.4, 1) both;
+}
+.data-col:nth-child(3n) {
+  color: var(--color-amber);
+}
+@keyframes data-fall {
+  0% { transform: translateY(-110%); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(110vh); opacity: 0; }
+}
+
+.glitch-cut {
+  animation: glitch-shift 0.4s steps(3) 1;
+}
+
+/* Hologram materialize: build up from scan lines bottom → top with an RGB split. */
+.glass[data-mat="out"] {
+  opacity: 0;
+  clip-path: inset(100% 0 0 0);
+}
+.glass[data-mat="in"] {
+  animation: materialize 0.75s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+}
+@keyframes materialize {
+  0% {
+    opacity: 0.2;
+    clip-path: inset(100% 0 0 0);
+    filter: drop-shadow(-3px 0 rgb(255 0 90 / 0.7)) drop-shadow(3px 0 rgb(0 229 255 / 0.8));
+    background-image: repeating-linear-gradient(to bottom, rgb(0 229 255 / 0.25) 0 1px, transparent 1px 4px);
+  }
+  55% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    filter: drop-shadow(-2px 0 rgb(255 0 90 / 0.5)) drop-shadow(2px 0 rgb(0 229 255 / 0.6));
+  }
+  65% { opacity: 0.55; }
+  72% { opacity: 1; filter: none; }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass[data-mat="out"] {
+    clip-path: none;
+  }
+  .glass[data-mat="in"] {
+    animation: fade-in 0.2s ease both !important;
+    animation-duration: 0.2s !important;
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
