@@ -92,7 +92,7 @@ export function Projects() {
     () => {
       const mm = gsap.matchMedia();
       // Camera dolly: each case file flies in from deep space and drifts past.
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
+      mm.add("(prefers-reduced-motion: no-preference) and (min-width: 1024px)", () => {
         gsap.utils.toArray<HTMLElement>(".case-file").forEach((el, i) => {
           const side = i % 2 ? 1 : -1;
           gsap.fromTo(
@@ -109,6 +109,20 @@ export function Projects() {
             },
           );
         });
+      });
+      // Mobile: a light fade-up instead of the 3D dolly.
+      mm.add("(prefers-reduced-motion: no-preference) and (max-width: 1023px)", () => {
+        gsap.utils.toArray<HTMLElement>(".case-file").forEach((el) => {
+          gsap.from(el, {
+            y: 40,
+            opacity: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none none" },
+          });
+        });
+      });
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
         gsap.to(".projects-grid-bg", {
           backgroundPositionY: "400px",
           ease: "none",
