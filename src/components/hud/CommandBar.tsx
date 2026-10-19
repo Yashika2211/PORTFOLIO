@@ -164,7 +164,7 @@ export function CommandBar() {
               }}
             >
               <div className="flex items-center justify-between border-b border-cyan/15 px-4 py-2">
-                <span className="hud-label">{assistant.name} // comms</span>
+                <span className="hud-label">{assistant.name} {"//"} comms</span>
                 <button
                   type="button"
                   onClick={() => setCommandOpen(false)}
