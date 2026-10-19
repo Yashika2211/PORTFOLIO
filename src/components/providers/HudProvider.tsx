@@ -18,6 +18,9 @@ type HudState = {
   setCommandOpen: (open: boolean) => void;
   openProject: string | null;
   setOpenProject: (slug: string | null) => void;
+  /** Skill hovered/focused in the constellation — highlights related projects. */
+  activeSkill: string | null;
+  setActiveSkill: (skill: string | null) => void;
 };
 
 const HudContext = createContext<HudState | null>(null);
@@ -39,6 +42,7 @@ export function HudProvider({ children }: { children: ReactNode }) {
   const [sound, setSound] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [openProject, setOpenProject] = useState<string | null>(null);
+  const [activeSkill, setActiveSkill] = useState<string | null>(null);
 
   useEffect(() => {
     const p = loadPrefs();
@@ -59,8 +63,19 @@ export function HudProvider({ children }: { children: ReactNode }) {
   const toggleSound = useCallback(() => setSound((v) => !v), []);
 
   const value = useMemo(
-    () => ({ voice, sound, toggleVoice, toggleSound, commandOpen, setCommandOpen, openProject, setOpenProject }),
-    [voice, sound, toggleVoice, toggleSound, commandOpen, openProject],
+    () => ({
+      voice,
+      sound,
+      toggleVoice,
+      toggleSound,
+      commandOpen,
+      setCommandOpen,
+      openProject,
+      setOpenProject,
+      activeSkill,
+      setActiveSkill,
+    }),
+    [voice, sound, toggleVoice, toggleSound, commandOpen, openProject, activeSkill],
   );
 
   return <HudContext.Provider value={value}>{children}</HudContext.Provider>;
