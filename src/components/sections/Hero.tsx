@@ -24,7 +24,7 @@ export function Hero({ ready }: { ready: boolean }) {
 
   return (
     <section id="hero" aria-labelledby="hero-title" className="relative flex min-h-[100svh] items-center overflow-hidden pt-24">
-      <div className="pointer-events-none absolute inset-0 md:left-[30%]">
+      <div className="pointer-events-none absolute inset-0 max-md:opacity-60">
         {ready && use3D ? <CoreCanvas mobile={caps.mobile} /> : <StaticCore />}
       </div>
 

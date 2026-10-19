@@ -128,8 +128,8 @@ export function ArcCore({ particles = 1400, detail = 20 }: { particles?: number;
         <meshBasicMaterial color={CYAN} wireframe transparent opacity={0.22} toneMapped={false} />
       </mesh>
       <mesh>
-        <sphereGeometry args={[0.32, 32, 32]} />
-        <meshBasicMaterial color={"#c8fbff"} toneMapped={false} />
+        <sphereGeometry args={[0.22, 32, 32]} />
+        <meshBasicMaterial color={"#7ff4ff"} toneMapped={false} />
       </mesh>
 
       <Ring radius={1.75} speed={0.35} tilt={[Math.PI / 2.1, 0.2]} color={CYAN} opacity={0.75} />

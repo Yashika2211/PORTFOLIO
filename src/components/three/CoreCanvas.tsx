@@ -40,13 +40,16 @@ export default function CoreCanvas({ mobile }: { mobile: boolean }) {
         gl={{ antialias: !mobile, alpha: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
       >
-        <ArcCore particles={mobile ? 500 : 1400} detail={mobile ? 10 : 20} />
+        {/* Desktop: core sits right of the copy. Mobile: lower and behind it. */}
+        <group position={mobile ? [0, -1.6, 0] : [2.1, 0, 0]}>
+          <ArcCore particles={mobile ? 500 : 1400} detail={mobile ? 10 : 20} />
+        </group>
         {!mobile && (
           <EffectComposer multisampling={0}>
             <Bloom intensity={1.1} luminanceThreshold={0.15} luminanceSmoothing={0.3} mipmapBlur />
             <ChromaticAberration offset={chroma.current} blendFunction={BlendFunction.NORMAL} radialModulation={false} modulationOffset={0} />
             <Noise opacity={0.035} premultiply />
-            <Vignette eskil={false} offset={0.25} darkness={0.7} />
+            <Vignette eskil={false} offset={0.25} darkness={0.5} />
           </EffectComposer>
         )}
       </Canvas>
