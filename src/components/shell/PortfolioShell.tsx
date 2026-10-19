@@ -18,6 +18,7 @@ import { Stage } from "@/scenes/Stage";
 import { Director } from "@/yashu/Director";
 import { Transitions } from "@/yashu/transitions/Transitions";
 import { EasterEggs } from "@/yashu/ui/EasterEggs";
+import { ExitIntent } from "@/yashu/ui/ExitIntent";
 import { Subtitles } from "@/yashu/ui/Subtitles";
 import { Toasts } from "@/yashu/ui/Toasts";
 import { VoicePrompt } from "@/yashu/ui/VoicePrompt";
@@ -55,6 +56,7 @@ export function PortfolioShell() {
         <Subtitles />
         <Toasts />
         <EasterEggs />
+        <ExitIntent ready={ready} />
       </SmoothScroll>
     </>
   );
