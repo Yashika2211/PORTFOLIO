@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { assistant, profile, sections } from "@/data/portfolio";
 import { useGitHub } from "@/lib/github";
 import { playSound } from "@/lib/sound";
+import { ACHIEVEMENTS } from "@/yashu/achievements";
 import { runCommand } from "@/yashu/commands";
 import { micSupported, startListening, stopListening } from "@/yashu/listen";
 import { useShallow } from "zustand/react/shallow";
@@ -90,7 +91,7 @@ export function HudFrame() {
   const time = useClock();
   const { pct, active } = useScrollProgress();
   const gh = useGitHub();
-  const { voice, sound, setVoice, toggleSound, setCommandOpen, micOn, listening, set } = useYashu(
+  const { voice, sound, setVoice, toggleSound, setCommandOpen, micOn, listening, set, badges } = useYashu(
     useShallow((s) => ({
       voice: s.voice,
       sound: s.sound,
@@ -100,6 +101,7 @@ export function HudFrame() {
       micOn: s.micOn,
       listening: s.listening,
       set: s.set,
+      badges: s.achievements.filter((a) => ACHIEVEMENTS.some((x) => x.id === a)).length,
     })),
   );
   const [ttsOk, setTtsOk] = useState(true);
@@ -217,6 +219,12 @@ export function HudFrame() {
             </div>
           </dl>
           <dl className="flex gap-5 text-right">
+            <div className="flex gap-1.5">
+              <dt className="text-amber">BADGES</dt>
+              <dd className="tabular-nums">
+                {badges}/{ACHIEVEMENTS.length}
+              </dd>
+            </div>
             <div className="flex gap-1.5">
               <dt className="text-cyan">REPOS</dt>
               <dd className="tabular-nums">

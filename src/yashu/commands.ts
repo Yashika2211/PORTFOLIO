@@ -83,6 +83,7 @@ export function perform(action: Action) {
       break;
     case "hire":
       s.setCommandOpen(false);
+      s.unlock("root", "Root access", "Ran sudo hire yashika.");
       s.set({ celebrate: s.celebrate + 1 });
       window.setTimeout(() => {
         s.warpTo("contact");
