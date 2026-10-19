@@ -12,6 +12,8 @@ export type Rect = { x: number; y: number; w: number; h: number };
 type State = {
   /** Persisted state has been read from localStorage. */
   hydrated: boolean;
+  /** The shared WebGL scene is running (false → 2D fallbacks render instead). */
+  gl3d: boolean;
   /** null = visitor hasn't chosen yet (show the ENGAGE / SILENT MODE prompt). */
   voice: boolean | null;
   sound: boolean;
@@ -71,6 +73,7 @@ export const useYashu = create<State & Actions>()(
   persist(
     (set, get) => ({
       hydrated: false,
+      gl3d: false,
       voice: null,
       sound: false,
       micOn: false,
