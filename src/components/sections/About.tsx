@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { profile, stats, type Stat } from "@/data/portfolio";
+
+const gauges: Stat[] = [...stats, { id: "cgpa", value: 8.87, decimals: 2, suffix: "/10", label: "CGPA — B.Tech CSE (Data Science)" }];
 import { useCountUp, useInView } from "@/lib/useInView";
 import { SectionHeading } from "@/components/hud/SectionHeading";
 
@@ -10,8 +12,8 @@ const C = 2 * Math.PI * R;
 
 function Gauge({ stat, start }: { stat: Stat; start: boolean }) {
   const n = useCountUp(stat.value, start);
-  // Ring fill is decorative except for the F0.5 score, which is a true 0–1 ratio.
-  const ratio = stat.value <= 1 ? stat.value : 1;
+  // Ring fill is decorative except for true ratios (F0.5 score, CGPA out of 10).
+  const ratio = stat.value <= 1 ? stat.value : stat.suffix === "/10" ? stat.value / 10 : 1;
   const progress = stat.value === 0 ? 0 : (n / stat.value) * ratio;
   const shown = stat.decimals ? n.toFixed(stat.decimals) : Math.round(n).toString();
 
@@ -119,7 +121,7 @@ export function About() {
       <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,28rem)_1fr]">
         <IdCard />
         <ul ref={ref} className="grid grid-cols-2 gap-4 sm:grid-cols-3" aria-label="Key stats">
-          {stats.map((s) => (
+          {gauges.map((s) => (
             <Gauge key={s.id} stat={s} start={inView} />
           ))}
         </ul>
