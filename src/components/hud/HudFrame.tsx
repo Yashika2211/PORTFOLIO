@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { assistant, profile, sections } from "@/data/portfolio";
 import { useGitHub } from "@/lib/github";
 import { playSound } from "@/lib/sound";
-import { speechOutputSupported } from "@/lib/speech";
+import { runCommand } from "@/yashu/commands";
+import { micSupported, startListening, stopListening } from "@/yashu/listen";
 import { useShallow } from "zustand/react/shallow";
 import { useYashu } from "@/yashu/store";
 import { scrollToSection } from "@/components/providers/SmoothScroll";
@@ -89,11 +90,33 @@ export function HudFrame() {
   const time = useClock();
   const { pct, active } = useScrollProgress();
   const gh = useGitHub();
-  const { voice, sound, setVoice, toggleSound, setCommandOpen } = useYashu(
-    useShallow((s) => ({ voice: s.voice, sound: s.sound, setVoice: s.setVoice, toggleSound: s.toggleSound, setCommandOpen: s.setCommandOpen })),
+  const { voice, sound, setVoice, toggleSound, setCommandOpen, micOn, listening, set } = useYashu(
+    useShallow((s) => ({
+      voice: s.voice,
+      sound: s.sound,
+      setVoice: s.setVoice,
+      toggleSound: s.toggleSound,
+      setCommandOpen: s.setCommandOpen,
+      micOn: s.micOn,
+      listening: s.listening,
+      set: s.set,
+    })),
   );
   const [ttsOk, setTtsOk] = useState(true);
-  useEffect(() => setTtsOk(speechOutputSupported()), []);
+  const [micOk, setMicOk] = useState(false);
+  useEffect(() => {
+    setTtsOk("speechSynthesis" in window);
+    setMicOk(micSupported());
+  }, []);
+  const toggleWake = () => {
+    if (micOn) {
+      stopListening();
+      set({ micOn: false });
+    } else {
+      set({ micOn: true });
+      startListening("wake", (t) => void runCommand(t, "voice"));
+    }
+  };
 
   return (
     <>
@@ -146,6 +169,7 @@ export function HudFrame() {
             <div className="hidden items-center gap-2 md:flex">
               <Toggle on={voice === true} label="Voice" onClick={() => setVoice(voice !== true)} disabled={!ttsOk} />
               <Toggle on={sound} label="SFX" onClick={toggleSound} />
+              {micOk && <Toggle on={micOn} label={"\u201cHey Yashu\u201d"} onClick={toggleWake} />}
             </div>
             <button
               type="button"
@@ -161,6 +185,16 @@ export function HudFrame() {
           </div>
         </div>
       </header>
+
+      {micOn && (
+        <div
+          role="status"
+          className="fixed left-1/2 top-[4.6rem] z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-amber/60 bg-void/85 px-3 py-1 font-mono text-[11px] text-amber backdrop-blur"
+        >
+          <span className={`h-2 w-2 rounded-full bg-amber ${listening ? "pulse-dot" : "opacity-50"}`} aria-hidden="true" />
+          Listening for &ldquo;Hey Yashu&rdquo;
+        </div>
+      )}
 
       {/* Bottom readouts */}
       <footer
