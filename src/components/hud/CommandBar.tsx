@@ -1,129 +1,67 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { assistant } from "@/data/portfolio";
-import { resolveCommand, SUGGESTIONS, type Action } from "@/lib/assistant";
-import { playSound } from "@/lib/sound";
-import { listenOnce, speak, speechInputSupported } from "@/lib/speech";
 import { useShallow } from "zustand/react/shallow";
+import { assistant } from "@/data/portfolio";
+import { playSound } from "@/lib/sound";
+import { runCommand } from "@/yashu/commands";
+import { SUGGESTIONS } from "@/yashu/intents";
+import { micSupported, startListening, stopListening } from "@/yashu/listen";
 import { useYashu } from "@/yashu/store";
-import { signals as coreSignal } from "@/yashu/signals";
-import { scrollToSection } from "@/components/providers/SmoothScroll";
 
 type LogEntry = { who: "you" | "yashu"; text: string };
 
-function pulseCore(ms = 900) {
-  coreSignal.speaking = true;
-  window.setTimeout(() => (coreSignal.speaking = false), ms);
-}
-
 export function CommandBar() {
-  const { commandOpen, setCommandOpen, openCaseFile, voice } = useYashu(
-    useShallow((s) => ({ commandOpen: s.commandOpen, setCommandOpen: s.setCommandOpen, openCaseFile: s.openCaseFile, voice: s.voice })),
+  const { commandOpen, setCommandOpen, listening } = useYashu(
+    useShallow((s) => ({ commandOpen: s.commandOpen, setCommandOpen: s.setCommandOpen, listening: s.listening })),
   );
-  const setOpenProject = (slug: string) => openCaseFile(slug);
-  const router = useRouter();
   const [input, setInput] = useState("");
   const [log, setLog] = useState<LogEntry[]>([
-    { who: "yashu", text: `${assistant.name} online. Ask me to show projects, open a case file, or fetch the resume.` },
+    { who: "yashu", text: `${assistant.name} online. Ask me anything about Yashika, or try a suggestion below.` },
   ]);
-  const [listening, setListening] = useState(false);
   const [micOk, setMicOk] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const stopRef = useRef<() => void>(() => {});
   const returnFocus = useRef<HTMLElement | null>(null);
 
-  useEffect(() => setMicOk(speechInputSupported()), []);
+  useEffect(() => setMicOk(micSupported()), []);
 
   // Global shortcut: Cmd/Ctrl + K
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setCommandOpen(!commandOpen);
+        setCommandOpen(!useYashu.getState().commandOpen);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [commandOpen, setCommandOpen]);
+  }, [setCommandOpen]);
 
   useEffect(() => {
     if (commandOpen) {
       returnFocus.current = document.activeElement as HTMLElement | null;
       playSound("open");
       window.setTimeout(() => inputRef.current?.focus(), 30);
-    } else {
-      stopRef.current();
-      returnFocus.current?.focus?.();
+    } else if (returnFocus.current) {
+      returnFocus.current.focus?.();
+      returnFocus.current = null;
     }
   }, [commandOpen]);
 
-  const perform = useCallback(
-    (action: Action) => {
-      switch (action.type) {
-        case "scroll":
-          setCommandOpen(false);
-          window.setTimeout(() => scrollToSection(action.section), 120);
-          break;
-        case "openProject":
-          setCommandOpen(false);
-          scrollToSection("projects");
-          window.setTimeout(() => setOpenProject(action.slug), 500);
-          break;
-        case "download": {
-          const a = document.createElement("a");
-          a.href = action.href;
-          a.download = "";
-          a.click();
-          break;
-        }
-        case "link":
-          window.open(action.href, "_blank", "noopener,noreferrer");
-          break;
-        case "recruiter":
-          router.push("/recruiter");
-          break;
-      }
-    },
-    [router, setCommandOpen, openCaseFile],
-  );
-
-  const submit = useCallback(
-    async (text: string) => {
-      const q = text.trim();
-      if (!q) return;
-      setInput("");
-      setLog((l) => [...l, { who: "you", text: q }]);
-      const reply = await resolveCommand(q);
-      setLog((l) => [...l.slice(-8), { who: "yashu", text: reply.text }]);
-      playSound("click");
-      if (voice) {
-        speak(reply.text, {
-          onStart: () => (coreSignal.speaking = true),
-          onEnd: () => (coreSignal.speaking = false),
-        });
-      } else {
-        pulseCore();
-      }
-      perform(reply.action);
-    },
-    [perform, voice],
-  );
+  const submit = useCallback(async (text: string, source: "typed" | "voice" = "typed") => {
+    const q = text.trim();
+    if (!q) return;
+    setInput("");
+    setLog((l) => [...l.slice(-8), { who: "you", text: q }]);
+    playSound("click");
+    const line = await runCommand(q, source);
+    setLog((l) => [...l.slice(-8), { who: "yashu", text: line }]);
+  }, []);
 
   const toggleMic = useCallback(() => {
-    if (listening) {
-      stopRef.current();
-      return;
-    }
-    const { promise, stop } = listenOnce();
-    stopRef.current = stop;
-    setListening(true);
-    promise
-      .then((t) => void submit(t))
-      .catch(() => setLog((l) => [...l, { who: "yashu", text: "Didn't hear anything — try typing instead." }]))
-      .finally(() => setListening(false));
+    if (listening) return stopListening();
+    startListening("once", (t) => void submit(t, "voice"));
   }, [listening, submit]);
 
   return (
@@ -169,7 +107,9 @@ export function CommandBar() {
               }}
             >
               <div className="flex items-center justify-between border-b border-cyan/15 px-4 py-2">
-                <span className="hud-label">{assistant.name} {"//"} comms</span>
+                <span className="hud-label">
+                  {assistant.name} {"//"} comms
+                </span>
                 <button
                   type="button"
                   onClick={() => setCommandOpen(false)}
@@ -180,7 +120,7 @@ export function CommandBar() {
                 </button>
               </div>
 
-              <div className="max-h-64 space-y-2 overflow-y-auto px-4 py-3 font-mono text-sm" aria-live="polite">
+              <div className="max-h-64 space-y-2 overflow-y-auto px-4 py-3 font-mono text-sm" data-lenis-prevent>
                 {log.map((m, i) => (
                   <p key={i} className={m.who === "you" ? "text-amber" : "text-ink"}>
                     <span className="mr-2 text-muted">{m.who === "you" ? "you >" : "yashu >"}</span>
@@ -197,15 +137,16 @@ export function CommandBar() {
                 }}
               >
                 <label htmlFor="yashu-input" className="sr-only">
-                  Command
+                  Command or question
                 </label>
                 <input
                   id="yashu-input"
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder='Try "open Haggle"'
+                  placeholder={listening ? "Listening…" : 'Try "open Haggle" or ask a question'}
                   autoComplete="off"
+                  maxLength={300}
                   className="min-w-0 flex-1 rounded-md border border-cyan/25 bg-void/60 px-3 py-2 font-mono text-sm text-ink placeholder:text-muted/70 focus:border-cyan focus:outline-none"
                 />
                 {micOk && (
@@ -214,10 +155,11 @@ export function CommandBar() {
                     onClick={toggleMic}
                     aria-pressed={listening}
                     aria-label={listening ? "Stop listening" : "Speak a command"}
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md border transition ${
+                    className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-md border transition ${
                       listening ? "border-amber bg-amber/15 text-amber" : "border-cyan/40 text-cyan hover:bg-cyan/10"
                     }`}
                   >
+                    {listening && <span className="absolute inset-0 animate-ping rounded-md border border-amber/60" aria-hidden="true" />}
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                       <rect x="9" y="3" width="6" height="11" rx="3" />
                       <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
