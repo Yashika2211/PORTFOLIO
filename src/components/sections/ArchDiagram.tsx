@@ -1,6 +1,6 @@
 import type { Project } from "@/data/portfolio";
 
-const NODE_W = 22;
+const NODE_W = 27;
 const NODE_H = 8;
 
 /** Animated architecture mini-diagram on a 100×60 grid; edges flow node → node. */
@@ -13,7 +13,7 @@ export function ArchDiagram({ arch, title, uid }: { arch: Project["arch"]; title
   return (
     <figure className="glass p-3">
       <figcaption className="hud-label mb-2 px-1">Architecture</figcaption>
-      <svg viewBox="0 0 100 60" className="h-auto w-full" role="img" aria-label={`${title} architecture: ${description}`}>
+      <svg viewBox="-4 0 108 60" className="h-auto w-full" role="img" aria-label={`${title} architecture: ${description}`}>
         <defs>
           <marker id={`arrow-${uid}`} viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
             <path d="M0,0 L6,3 L0,6 Z" fill="#ffb547" />
@@ -67,7 +67,7 @@ export function ArchDiagram({ arch, title, uid }: { arch: Project["arch"]; title
               strokeOpacity="0.7"
               strokeWidth="0.35"
             />
-            <text x={n.x} y={n.y + 1} textAnchor="middle" fontSize="2.9" className="fill-ink font-sans">
+            <text x={n.x} y={n.y + 1} textAnchor="middle" fontSize="2.7" className="fill-ink font-sans">
               {n.label}
             </text>
           </g>
