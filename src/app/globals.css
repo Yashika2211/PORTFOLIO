@@ -274,3 +274,15 @@ html.booted .boot-overlay {
   from { clip-path: inset(0 100% 0 0); }
   to { clip-path: inset(0 0 0 0); }
 }
+
+/* ---------- HUD panel entrance (glitch slide-in) ---------- */
+[data-play="true"] .hud-in {
+  animation: hud-in 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0s) both;
+}
+@keyframes hud-in {
+  0% { opacity: 0; transform: translateY(18px); filter: blur(6px); }
+  55% { opacity: 0.85; transform: translate(-2px, 2px); filter: blur(0); }
+  62% { opacity: 0.3; }
+  70% { opacity: 1; transform: translate(1px, 0); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
