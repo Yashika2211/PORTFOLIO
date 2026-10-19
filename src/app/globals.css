@@ -382,3 +382,25 @@ html.booted .boot-overlay {
     to { opacity: 1; }
   }
 }
+
+/* ---------- Case-file projector ---------- */
+.case-file::after {
+  content: "";
+  position: absolute;
+  right: 22%;
+  bottom: -6px;
+  width: 64px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgb(0 229 255 / 0.9), rgb(0 229 255 / 0) 70%);
+  opacity: 0.35;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.case-file[data-projecting]::after {
+  opacity: 1;
+}
+/* The hologram "casts light" back onto its panel. */
+.case-file[data-projecting] .glass {
+  background-image: radial-gradient(ellipse 45% 70% at 80% 30%, rgb(0 229 255 / 0.12), transparent 70%);
+}
