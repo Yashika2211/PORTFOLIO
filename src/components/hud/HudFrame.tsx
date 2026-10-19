@@ -11,7 +11,7 @@ import { scrollToSection } from "@/components/providers/SmoothScroll";
 
 function Corner({ className }: { className: string }) {
   return (
-    <svg aria-hidden="true" width="44" height="44" viewBox="0 0 44 44" className={`pointer-events-none fixed z-40 ${className}`}>
+    <svg aria-hidden="true" width="44" height="44" viewBox="0 0 44 44" className={`pointer-events-none fixed z-40 hidden md:block ${className}`}>
       <path d="M1 22 V1 H22" fill="none" stroke="#00e5ff" strokeOpacity="0.8" strokeWidth="1.5" />
       <path d="M6 12 V6 H12" fill="none" stroke="#ffb547" strokeOpacity="0.8" strokeWidth="1" />
     </svg>
