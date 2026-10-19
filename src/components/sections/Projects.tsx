@@ -3,13 +3,50 @@
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import { projects, type Project } from "@/data/portfolio";
 import { playSound } from "@/lib/sound";
 import { SectionHeading } from "@/components/hud/SectionHeading";
 import { useShallow } from "zustand/react/shallow";
 import { useYashu } from "@/yashu/store";
 import { Lab } from "./Lab";
+
+const ProjectionView = dynamic(() => import("@/scenes/projections/ProjectionView"), { ssr: false });
+
+/** Hover/focus shows the projection; keep it mounted briefly so it can sink back down. */
+function useProjection(slug: string) {
+  const ref = useRef<HTMLLIElement>(null);
+  const gl3d = useYashu((s) => s.gl3d);
+  const [near, setNear] = useState(false);
+  const [shown, setShown] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const fine = typeof window !== "undefined" && window.matchMedia("(pointer: fine)").matches;
+  const enabled = gl3d && fine;
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !enabled) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      setNear(true);
+      void import("@/scenes/projections/ProjectionView").then((m) => m.preloadModel(slug));
+      io.disconnect();
+    }, { rootMargin: "400px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [enabled, slug]);
+
+  useEffect(() => {
+    if (shown) setMounted(true);
+    else if (mounted) {
+      const t = window.setTimeout(() => setMounted(false), 600);
+      return () => clearTimeout(t);
+    }
+  }, [shown, mounted]);
+
+  return { ref, enabled: enabled && near, shown, mounted, show: () => setShown(true), hide: () => setShown(false) };
+}
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -19,6 +56,7 @@ function CaseFile({ project, index }: { project: Project; index: number }) {
   );
   const tilt = useRef<HTMLDivElement>(null);
   const related = activeSkill ? project.skills.includes(activeSkill) : null;
+  const proj = useProjection(project.slug);
   const headline = project.metrics[0];
 
   const onMove = (e: React.PointerEvent) => {
@@ -34,7 +72,17 @@ function CaseFile({ project, index }: { project: Project; index: number }) {
   };
 
   return (
-    <li data-case={project.slug} className={`case-file [perspective:1200px] ${index % 2 ? "lg:ml-auto" : ""} lg:w-[78%]`}>
+    <li
+      ref={proj.ref}
+      data-case={project.slug}
+      data-projecting={proj.shown || undefined}
+      className={`case-file relative [perspective:1200px] ${index % 2 ? "lg:ml-auto" : ""} lg:w-[78%]`}
+      onMouseEnter={proj.show}
+      onMouseLeave={proj.hide}
+      onFocus={proj.show}
+      onBlur={proj.hide}
+    >
+      {proj.enabled && proj.mounted && <ProjectionView slug={project.slug} shown={proj.shown} />}
       <div ref={tilt} className="transition-transform duration-300 ease-out [transform-style:preserve-3d]">
         <button
           type="button"
