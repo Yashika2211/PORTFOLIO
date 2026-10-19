@@ -10,6 +10,8 @@ export type Subtitle = { id: number; text: string; streaming?: boolean };
 export type Rect = { x: number; y: number; w: number; h: number };
 
 type State = {
+  /** Persisted state has been read from localStorage. */
+  hydrated: boolean;
   /** null = visitor hasn't chosen yet (show the ENGAGE / SILENT MODE prompt). */
   voice: boolean | null;
   sound: boolean;
@@ -62,6 +64,7 @@ let seq = 0;
 export const useYashu = create<State & Actions>()(
   persist(
     (set, get) => ({
+      hydrated: false,
       voice: null,
       sound: false,
       micOn: false,
