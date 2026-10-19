@@ -32,7 +32,7 @@ function CaseFile({ project, index }: { project: Project; index: number }) {
   };
 
   return (
-    <li className={`case-file [perspective:1200px] ${index % 2 ? "lg:ml-auto" : ""} lg:w-[78%]`}>
+    <li data-case={project.slug} className={`case-file [perspective:1200px] ${index % 2 ? "lg:ml-auto" : ""} lg:w-[78%]`}>
       <div ref={tilt} className="transition-transform duration-300 ease-out [transform-style:preserve-3d]">
         <button
           type="button"

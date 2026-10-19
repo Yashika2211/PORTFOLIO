@@ -22,7 +22,9 @@ function Block({ n, label, children }: { n: string; label: string; children: Rea
 }
 
 export function ProjectBriefing() {
-  const { openProject, closeCaseFile } = useYashu(useShallow((s) => ({ openProject: s.openProject, closeCaseFile: s.closeCaseFile })));
+  const { openProject, closeCaseFile, origin } = useYashu(
+    useShallow((s) => ({ openProject: s.openProject, closeCaseFile: s.closeCaseFile, origin: s.portalOrigin })),
+  );
   const project = projects.find((p) => p.slug === openProject) ?? null;
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -61,16 +63,36 @@ export function ProjectBriefing() {
     };
   }, [project, closeCaseFile]);
 
+  // Portal iris: grows from the clicked card's centre and collapses back into it.
+  const reduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const cx = origin ? origin.x + origin.w / 2 : typeof window !== "undefined" ? window.innerWidth / 2 : 0;
+  const cy = origin ? origin.y + origin.h / 2 : typeof window !== "undefined" ? window.innerHeight / 2 : 0;
+  const closed = reduced ? { opacity: 0 } : { clipPath: `circle(0px at ${cx}px ${cy}px)`, opacity: 1 };
+  const opened = reduced ? { opacity: 1 } : { clipPath: `circle(150% at ${cx}px ${cy}px)`, opacity: 1 };
+
   return (
     <AnimatePresence>
+      {project && !reduced && (
+        <motion.div
+          key={`iris-${project.slug}`}
+          aria-hidden="true"
+          className="pointer-events-none fixed z-[86] rounded-full border-2 border-cyan shadow-[0_0_40px_10px_rgba(0,229,255,0.5),inset_0_0_40px_rgba(0,229,255,0.6)]"
+          style={{ left: cx - 40, top: cy - 40, width: 80, height: 80 }}
+          initial={{ scale: 0.2, opacity: 1 }}
+          animate={{ scale: 30, opacity: 0 }}
+          exit={{ scale: 0.2, opacity: [0, 1, 0] }}
+          transition={{ duration: 0.7, ease: [0.5, 0, 0.2, 1] }}
+        />
+      )}
       {project && (
         <motion.div
           key={project.slug}
           className="fixed inset-0 z-[85] overflow-y-auto overscroll-contain bg-void/85 backdrop-blur-md"
           data-lenis-prevent
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={closed}
+          animate={opened}
+          exit={closed}
+          transition={{ duration: reduced ? 0.2 : 0.6, ease: [0.6, 0, 0.2, 1] }}
           onMouseDown={(e) => e.target === e.currentTarget && closeCaseFile()}
         >
           <motion.div
