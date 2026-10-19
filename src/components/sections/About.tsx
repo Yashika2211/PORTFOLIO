@@ -22,7 +22,8 @@ function Gauge({ stat, start, index }: { stat: Stat; start: boolean; index: numb
   const shown = stat.decimals ? n.toFixed(stat.decimals) : Math.round(n).toString();
 
   return (
-    <li className={`glass flex flex-col items-center p-4 text-center ${start ? "pop-out" : ""}`} style={{ "--d": `${0.2 + index * 0.12}s` } as React.CSSProperties}>
+    <li className={start ? "pop-out" : ""} style={{ "--d": `${0.9 + index * 0.12}s` } as React.CSSProperties}>
+      <div className="glass flex h-full flex-col items-center p-4 text-center">
       <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90" aria-hidden="true">
         <circle cx="50" cy="50" r={R} fill="none" stroke="rgb(0 229 255 / 0.12)" strokeWidth="6" />
         <circle
@@ -52,6 +53,7 @@ function Gauge({ stat, start, index }: { stat: Stat; start: boolean; index: numb
         </span>
         {stat.label}
       </p>
+      </div>
     </li>
   );
 }
