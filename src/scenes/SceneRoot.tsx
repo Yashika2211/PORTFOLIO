@@ -58,6 +58,7 @@ export default function SceneRoot({ mobile, lowPower, animate }: { mobile: boole
   const [tier, setTier] = useState<Tier>(mobile || lowPower ? 0 : 2);
   const [visible, setVisible] = useState(true);
   const overdrive = useYashu((s) => s.overdrive);
+  const briefing = useYashu((s) => s.openProject !== null);
 
   useEffect(() => {
     const onVis = () => setVisible(document.visibilityState === "visible");
@@ -94,12 +95,15 @@ export default function SceneRoot({ mobile, lowPower, animate }: { mobile: boole
         onFallback={() => setTier(0)}
       >
         <CameraRig animate={animate} />
-        <group position={mobile ? [0, -1.5, -1.5] : [2.1, 0, 0]}>
-          <ArcCore particles={CORE_PARTICLES[tier]} detail={tier === 2 ? 20 : 10} />
+        {/* Space scene pauses (and post-processing drops) while the canvas sits above a briefing. */}
+        <group visible={!briefing}>
+          <group position={mobile ? [0, -1.5, -1.5] : [2.1, 0, 0]}>
+            <ArcCore particles={CORE_PARTICLES[tier]} detail={tier === 2 ? 20 : 10} />
+          </group>
+          <Starfield count={PARTICLES[tier]} overdrive={overdrive} />
+          <Gates />
         </group>
-        <Starfield count={PARTICLES[tier]} overdrive={overdrive} />
-        <Gates />
-        {tier === 0 ? <PlainRender /> : <Effects tier={tier} />}
+        {tier === 0 || briefing ? <PlainRender /> : <Effects tier={tier} />}
         <View.Port />
       </PerformanceMonitor>
     </Canvas>

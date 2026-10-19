@@ -18,6 +18,8 @@ export function Stage({ ready }: { ready: boolean }) {
   const enabled = ready && canRender3D(caps) && !caps.reducedMotion;
   const stealth = useYashu((s) => s.stealth);
   const overdrive = useYashu((s) => s.overdrive);
+  // While a briefing is open the canvas rises above it so its 3D views can pop out.
+  const briefing = useYashu((s) => s.openProject !== null);
 
   useEffect(() => {
     useYashu.getState().set({ gl3d: enabled });
@@ -27,7 +29,7 @@ export function Stage({ ready }: { ready: boolean }) {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 -z-[5] transition-[opacity,filter] duration-700"
+      className={`pointer-events-none fixed inset-0 transition-[opacity,filter] duration-700 ${briefing ? "z-[86]" : "-z-[5]"}`}
       style={{
         opacity: stealth ? 0.3 : 1,
         filter: overdrive ? "hue-rotate(-150deg) saturate(1.5) brightness(1.1)" : undefined,
