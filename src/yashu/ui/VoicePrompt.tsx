@@ -22,7 +22,7 @@ export function VoicePrompt({ ready }: { ready: boolean }) {
           role="dialog"
           aria-modal="false"
           aria-labelledby="voice-prompt-title"
-          className="glass fixed bottom-24 left-1/2 z-[70] w-[min(440px,calc(100vw-32px))] -translate-x-1/2 p-5 text-center"
+          className="glass fixed bottom-24 left-1/2 z-[70] md:bottom-8 w-[min(440px,calc(100vw-32px))] -translate-x-1/2 p-5 text-center"
           initial={{ opacity: 0, y: 24, scaleY: 0.2 }}
           animate={{ opacity: 1, y: 0, scaleY: 1 }}
           exit={{ opacity: 0, y: 12, scaleY: 0.4 }}

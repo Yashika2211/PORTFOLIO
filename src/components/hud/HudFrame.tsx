@@ -69,7 +69,7 @@ function useScrollProgress() {
   return { pct, active };
 }
 
-function Toggle({ on, label, onClick, disabled }: { on: boolean; label: string; onClick: () => void; disabled?: boolean }) {
+function Toggle({ on, label, onClick, disabled, hint }: { on: boolean; label: string; onClick: () => void; disabled?: boolean; hint?: string }) {
   return (
     <button
       type="button"
@@ -79,7 +79,9 @@ function Toggle({ on, label, onClick, disabled }: { on: boolean; label: string; 
       }}
       disabled={disabled}
       aria-pressed={on}
-      className="flex items-center gap-1.5 rounded border border-cyan/30 px-2 py-1 font-mono text-[11px] uppercase tracking-wider text-muted transition hover:border-cyan hover:text-ink disabled:opacity-40 aria-pressed:border-amber/70 aria-pressed:text-amber"
+      aria-label={hint}
+      title={hint}
+      className="flex items-center gap-1.5 whitespace-nowrap rounded border border-cyan/30 px-2 py-1 font-mono text-[11px] uppercase tracking-wider text-muted transition hover:border-cyan hover:text-ink disabled:opacity-40 aria-pressed:border-amber/70 aria-pressed:text-amber"
     >
       <span className={`h-1.5 w-1.5 rounded-full ${on ? "bg-amber shadow-[0_0_6px_#ffb547]" : "bg-muted/50"}`} aria-hidden="true" />
       {label} {on ? "on" : "off"}
@@ -146,7 +148,7 @@ export function HudFrame() {
             {assistant.name}
           </button>
 
-          <nav aria-label="Sections" className="hidden lg:block">
+          <nav aria-label="Sections" className="hidden xl:block">
             <ul className="flex items-center gap-1">
               {sections.slice(1).map((s) => (
                 <li key={s.id}>
@@ -171,17 +173,17 @@ export function HudFrame() {
             <div className="hidden items-center gap-2 md:flex">
               <Toggle on={voice === true} label="Voice" onClick={() => setVoice(voice !== true)} disabled={!ttsOk} />
               <Toggle on={sound} label="SFX" onClick={toggleSound} />
-              {micOk && <Toggle on={micOn} label={"\u201cHey Yashu\u201d"} onClick={toggleWake} />}
+              {micOk && <Toggle on={micOn} label="Wake" hint={`Listen for "Hey Yashu" (${micOn ? "on" : "off"})`} onClick={toggleWake} />}
             </div>
             <button
               type="button"
               onClick={() => setCommandOpen(true)}
-              className="hidden items-center gap-2 rounded border border-cyan/30 px-2 py-1 font-mono text-[11px] text-muted transition hover:border-cyan hover:text-ink sm:flex"
+              className="hidden items-center gap-2 whitespace-nowrap rounded border border-cyan/30 px-2 py-1 font-mono text-[11px] text-muted transition hover:border-cyan hover:text-ink sm:flex"
               aria-label="Open command bar"
             >
               Ask <kbd className="rounded bg-cyan/10 px-1 text-cyan">⌘K</kbd>
             </button>
-            <Link href="/recruiter" className="btn-energy amber !px-3 !py-1.5 !text-[10px]">
+            <Link href="/recruiter" className="btn-energy amber whitespace-nowrap !px-3 !py-1.5 !text-[10px]">
               Skip the show →
             </Link>
           </div>
