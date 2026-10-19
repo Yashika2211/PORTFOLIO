@@ -415,3 +415,19 @@ html.booted .boot-overlay {
   35% { transform: translateZ(120px) scale(1.08); box-shadow: 0 30px 60px rgb(0 0 0 / 0.5), 0 0 40px rgb(0 229 255 / 0.35); }
   100% { transform: translateZ(0) scale(1); }
 }
+
+/* ---------- Cursor lock-on brackets ---------- */
+.lock-on {
+  --c: rgb(255 181 71 / 0.95);
+  background:
+    linear-gradient(var(--c), var(--c)) top left / 22px 2px,
+    linear-gradient(var(--c), var(--c)) top left / 2px 22px,
+    linear-gradient(var(--c), var(--c)) top right / 22px 2px,
+    linear-gradient(var(--c), var(--c)) top right / 2px 22px,
+    linear-gradient(var(--c), var(--c)) bottom left / 22px 2px,
+    linear-gradient(var(--c), var(--c)) bottom left / 2px 22px,
+    linear-gradient(var(--c), var(--c)) bottom right / 22px 2px,
+    linear-gradient(var(--c), var(--c)) bottom right / 2px 22px;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 0 6px rgb(255 181 71 / 0.7));
+}
