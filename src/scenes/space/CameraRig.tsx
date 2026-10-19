@@ -75,11 +75,11 @@ export function Gates() {
         <group key={i} position={[p[0] * 0.6, p[1] * 0.6, p[2] - 7]}>
           <mesh>
             <torusGeometry args={[5.5, 0.012, 6, 6]} />
-            <meshBasicMaterial color={i % 3 === 2 ? "#ffb547" : "#00e5ff"} transparent opacity={0.35} toneMapped={false} />
+            <meshBasicMaterial color={i % 3 === 2 ? "#ffb547" : "#00e5ff"} transparent opacity={0.14} toneMapped={false} />
           </mesh>
           <mesh rotation={[0, 0, Math.PI / 6]}>
             <torusGeometry args={[6.2, 0.006, 6, 6]} />
-            <meshBasicMaterial color="#00e5ff" transparent opacity={0.18} toneMapped={false} />
+            <meshBasicMaterial color="#00e5ff" transparent opacity={0.07} toneMapped={false} />
           </mesh>
         </group>
       ))}

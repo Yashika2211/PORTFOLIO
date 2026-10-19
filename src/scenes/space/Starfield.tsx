@@ -18,7 +18,7 @@ export function Starfield({ count = 2400, overdrive = false }: { count?: number;
     const m = new THREE.MeshBasicMaterial({
       vertexColors: false,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.42,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       toneMapped: false,
@@ -59,7 +59,7 @@ export function Starfield({ count = 2400, overdrive = false }: { count?: number;
 
   return (
     <instancedMesh ref={ref} args={[undefined, material, count]} frustumCulled={false}>
-      <boxGeometry args={[0.03, 0.03, 0.22]} />
+      <boxGeometry args={[0.022, 0.022, 0.2]} />
     </instancedMesh>
   );
 }
