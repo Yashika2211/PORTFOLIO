@@ -14,7 +14,9 @@ import { Lab } from "./Lab";
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 function CaseFile({ project, index }: { project: Project; index: number }) {
-  const { openCaseFile, activeSkill } = useYashu(useShallow((s) => ({ openCaseFile: s.openCaseFile, activeSkill: s.activeSkill })));
+  const { openCaseFile, activeSkill } = useYashu(
+    useShallow((s) => ({ openCaseFile: s.openCaseFile, activeSkill: s.activeSkill ?? s.pinnedSkill })),
+  );
   const tilt = useRef<HTMLDivElement>(null);
   const related = activeSkill ? project.skills.includes(activeSkill) : null;
   const headline = project.metrics[0];

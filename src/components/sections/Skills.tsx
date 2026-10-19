@@ -3,13 +3,13 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { awsServices, projects, skillGroups } from "@/data/portfolio";
-import { canRender3D, useCapabilities } from "@/lib/capabilities";
 import { playSound } from "@/lib/sound";
 import { SectionHeading } from "@/components/hud/SectionHeading";
 import { useShallow } from "zustand/react/shallow";
 import { useYashu } from "@/yashu/store";
 
-const SkillConstellation = dynamic(() => import("@/components/three/SkillConstellation"), { ssr: false });
+// Lazy so drei/three stay out of the main bundle; renders into the shared canvas.
+const ConstellationView = dynamic(() => import("@/scenes/views/ConstellationView"), { ssr: false });
 
 /** Mount once near the viewport, then keep rendering only while on screen. */
 function useVisibility<T extends Element>() {
@@ -33,11 +33,12 @@ function useVisibility<T extends Element>() {
 }
 
 export function Skills() {
-  const caps = useCapabilities();
-  const { activeSkill, setActiveSkill } = useYashu(useShallow((s) => ({ activeSkill: s.activeSkill, setActiveSkill: s.setActiveSkill })));
-  const { ref, mounted, onScreen } = useVisibility<HTMLDivElement>();
+  const { hovered, pinned, setActiveSkill, set, gl3d } = useYashu(
+    useShallow((s) => ({ hovered: s.activeSkill, pinned: s.pinnedSkill, setActiveSkill: s.setActiveSkill, set: s.set, gl3d: s.gl3d })),
+  );
+  const activeSkill = hovered ?? pinned;
+  const { ref, mounted } = useVisibility<HTMLDivElement>();
   const usedIn = activeSkill ? projects.filter((p) => p.skills.includes(activeSkill)) : [];
-  const show3D = canRender3D(caps) && !caps.reducedMotion;
 
   return (
     <section id="skills" aria-labelledby="skills-title" className="relative mx-auto max-w-7xl px-4 py-28 sm:px-8">
@@ -48,8 +49,8 @@ export function Skills() {
       <div className="grid items-start gap-10 lg:grid-cols-2">
         <div ref={ref} className="relative aspect-square w-full max-lg:max-h-[420px]" aria-hidden="true">
           <div className="absolute inset-[18%] rounded-full bg-[radial-gradient(circle,rgba(0,229,255,0.12),transparent_70%)]" />
-          {show3D && mounted ? (
-            <SkillConstellation active={activeSkill} onHover={setActiveSkill} mobile={caps.mobile} running={onScreen} />
+          {gl3d && mounted ? (
+            <ConstellationView />
           ) : (
             <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full">
               {skillGroups.map((g, i) => (
@@ -75,7 +76,7 @@ export function Skills() {
                 {usedIn.length > 0 && <> → {usedIn.map((p) => p.title).join(", ")}</>}
               </span>
             ) : (
-              "hover a node"
+              (gl3d ? "drag to rotate · click a node to trace it" : "hover a skill")
             )}
           </div>
         </div>
@@ -100,6 +101,8 @@ export function Skills() {
                           playSound("hover");
                         }}
                         onFocus={() => setActiveSkill(s)}
+                        onClick={() => set({ pinnedSkill: pinned === s ? null : s })}
+                        aria-pressed={pinned === s}
                         onBlur={() => setActiveSkill(null)}
                         aria-label={count ? `${s} — used in ${count} featured project${count > 1 ? "s" : ""}` : s}
                         className={`rounded-md border px-3 py-1.5 text-sm transition ${
