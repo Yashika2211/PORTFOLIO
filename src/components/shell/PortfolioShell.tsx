@@ -14,6 +14,10 @@ import { Hero } from "@/components/sections/Hero";
 import { ProjectBriefing } from "@/components/sections/ProjectBriefing";
 import { Projects } from "@/components/sections/Projects";
 import { Skills } from "@/components/sections/Skills";
+import { Director } from "@/yashu/Director";
+import { Subtitles } from "@/yashu/ui/Subtitles";
+import { Toasts } from "@/yashu/ui/Toasts";
+import { VoicePrompt } from "@/yashu/ui/VoicePrompt";
 import { YashuBridge } from "@/yashu/YashuBridge";
 
 export function PortfolioShell() {
@@ -41,6 +45,10 @@ export function PortfolioShell() {
           <Contact />
         </main>
         <ProjectBriefing />
+        <Director ready={ready} />
+        <VoicePrompt ready={ready} />
+        <Subtitles />
+        <Toasts />
       </SmoothScroll>
     </>
   );
