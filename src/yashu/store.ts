@@ -19,6 +19,12 @@ type State = {
   listening: boolean;
   gestures: boolean;
   overdrive: boolean;
+  /** "go dark": dims ambient visuals and silences audio. */
+  stealth: boolean;
+  /** Gesture-control consent panel is open. */
+  gesturePrompt: boolean;
+  /** Bumped to play the celebratory sequence (sudo hire yashika). */
+  celebrate: number;
 
   commandOpen: boolean;
   openProject: string | null;
@@ -71,6 +77,9 @@ export const useYashu = create<State & Actions>()(
       listening: false,
       gestures: false,
       overdrive: false,
+      stealth: false,
+      gesturePrompt: false,
+      celebrate: 0,
       commandOpen: false,
       openProject: null,
       portalOrigin: null,
