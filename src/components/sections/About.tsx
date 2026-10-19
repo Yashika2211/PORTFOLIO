@@ -1,11 +1,15 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { profile, stats, type Stat } from "@/data/portfolio";
 
 const gauges: Stat[] = [...stats, { id: "cgpa", value: 8.87, decimals: 2, suffix: "/10", label: "CGPA — B.Tech CSE (Data Science)" }];
 import { useCountUp, useInView } from "@/lib/useInView";
 import { SectionHeading } from "@/components/hud/SectionHeading";
+import { useYashu } from "@/yashu/store";
+
+const IdCardView = dynamic(() => import("@/scenes/views/IdCardView"), { ssr: false });
 
 const R = 42;
 const C = 2 * Math.PI * R;
@@ -56,16 +60,20 @@ function IdCard() {
   const [ref, inView] = useInView<HTMLDivElement>(0.4);
   const [flipped, setFlipped] = useState(false);
   // Card starts showing its back and flips to the front on entry.
-  const showBack = !inView || flipped;
+  const gl3d = useYashu((s) => s.gl3d);
+  const showBack = gl3d ? flipped : !inView || flipped;
 
   return (
-    <div ref={ref} className="[perspective:1400px]">
+    <div ref={ref} className="relative [perspective:1400px]">
+      {gl3d && inView && <IdCardView flipped={flipped} />}
       <button
         type="button"
         onClick={() => setFlipped((f) => !f)}
         aria-label={showBack ? "Show ID card front" : "Show ID card back (education and links)"}
-        className="relative block aspect-[1.58/1] w-full max-w-md text-left transition-transform duration-[1100ms] [transform-style:preserve-3d] [transition-timing-function:cubic-bezier(0.2,0.7,0.2,1)]"
-        style={{ transform: showBack ? "rotateY(180deg)" : "rotateY(0deg)" }}
+        className={`relative block aspect-[1.58/1] w-full max-w-md text-left transition-transform duration-[1100ms] [transform-style:preserve-3d] [transition-timing-function:cubic-bezier(0.2,0.7,0.2,1)] ${
+          gl3d ? "[&>div]:!opacity-0" : ""
+        }`}
+        style={{ transform: !gl3d && showBack ? "rotateY(180deg)" : "rotateY(0deg)" }}
       >
         {/* Front */}
         <div className="glass scan-hover absolute inset-0 flex flex-col justify-between p-5 [backface-visibility:hidden] sm:p-6" aria-hidden={showBack}>
