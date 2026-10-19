@@ -1,14 +1,43 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import { projects } from "@/data/portfolio";
 import { playSound } from "@/lib/sound";
 import { useShallow } from "zustand/react/shallow";
 import { useYashu } from "@/yashu/store";
 import { setScrollLocked } from "@/components/providers/SmoothScroll";
+import { enableTilt, tiltSupported } from "@/yashu/tilt";
 import { ArchDiagram } from "./ArchDiagram";
 import { FanChart } from "./FanChart";
+
+const ArchView = dynamic(() => import("@/scenes/views/ArchView"), { ssr: false });
+
+/** 3D architecture when WebGL runs (SVG stays for layout + screen readers), else the SVG. */
+function Architecture({ project }: { project: (typeof projects)[number] }) {
+  const gl3d = useYashu((s) => s.gl3d);
+  const [tiltOk, setTiltOk] = useState(false);
+  const [tiltOn, setTiltOn] = useState(false);
+  useEffect(() => setTiltOk(tiltSupported() && window.matchMedia("(pointer: coarse)").matches), []);
+  return (
+    <div className="relative">
+      {gl3d && <ArchView arch={project.arch} />}
+      <div className={gl3d ? "[&_svg]:opacity-0" : ""}>
+        <ArchDiagram arch={project.arch} title={project.title} uid={project.slug} />
+      </div>
+      {gl3d && tiltOk && !tiltOn && (
+        <button
+          type="button"
+          className="mt-2 font-mono text-xs text-cyan underline underline-offset-4"
+          onClick={async () => setTiltOn(await enableTilt())}
+        >
+          Enable tilt parallax
+        </button>
+      )}
+    </div>
+  );
+}
 
 function Block({ n, label, children }: { n: string; label: string; children: React.ReactNode }) {
   return (
@@ -145,7 +174,7 @@ export function ProjectBriefing() {
               </div>
               <div>
                 <Block n="03" label="Architecture">
-                  <ArchDiagram arch={project.arch} title={project.title} uid={project.slug} />
+                  <Architecture project={project} />
                 </Block>
                 <Block n="04" label="Hard numbers">
                   <dl className="grid grid-cols-2 gap-3">
