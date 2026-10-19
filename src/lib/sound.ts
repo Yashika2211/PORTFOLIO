@@ -1,5 +1,7 @@
 "use client";
 
+import { getAudioContext } from "@/yashu/audio";
+
 /**
  * Tiny synthesized UI sounds via Web Audio — no audio files to download.
  * Every call is a no-op unless sound has been enabled by the visitor.
@@ -15,20 +17,16 @@ const TONES: Record<Tone, { freq: number; to: number; dur: number; type: Oscilla
   boot: { freq: 110, to: 660, dur: 0.6, type: "sine", gain: 0.06 },
 };
 
-let ctx: AudioContext | null = null;
 let enabled = false;
 
 export function setSoundEnabled(on: boolean) {
   enabled = on;
-  if (on && !ctx && typeof window !== "undefined") {
-    const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (AC) ctx = new AC();
-  }
-  if (on) void ctx?.resume();
 }
 
 export function playSound(tone: Tone) {
-  if (!enabled || !ctx) return;
+  if (!enabled) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
   const t = TONES[tone];
   const now = ctx.currentTime;
   const osc = ctx.createOscillator();
