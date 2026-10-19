@@ -456,7 +456,7 @@ export const githubFallback = {
   recent: [
     { name: "PAYPALAIHACKATHON", pushedAt: "2026-10-17T23:30:15Z", url: "https://github.com/Yashika2211/PAYPALAIHACKATHON" },
     { name: "saans-saathi", pushedAt: "2026-10-08T12:13:29Z", url: "https://github.com/Yashika2211/saans-saathi" },
-    { name: "codenation", pushedAt: "2026-10-01T00:00:00Z", url: "https://github.com/Yashika2211/codenation" },
+    { name: "santhisathi", pushedAt: "2026-10-10T10:07:57Z", url: "https://github.com/Yashika2211/santhisathi" },
   ],
 };
 
