@@ -41,7 +41,7 @@ export default function ProjectionView({ slug, shown }: { slug: string; shown: b
   const Model = models[slug];
   if (!Model) return null;
   return (
-    <View index={2} className="pointer-events-none absolute bottom-[22%] right-[2%] h-[150%] w-[40%]">
+    <View index={2} className="pointer-events-none absolute bottom-[42%] right-[3%] h-[135%] w-[34%]">
       <PerspectiveCamera makeDefault position={[0, 0.2, 5]} fov={40} />
       <Rise shown={shown}>
         <Suspense fallback={null}>
