@@ -37,7 +37,16 @@ export function Stage({ ready }: { ready: boolean }) {
   const caps = useCapabilities();
   // Reduced motion gets the calm 2D fallbacks — no camera path, warp or glitch.
   const armed = useArmed(ready);
-  const enabled = armed && canRender3D(caps) && !caps.reducedMotion;
+  const [forced2D, setForced2D] = useState(false);
+  useEffect(() => {
+    // `localStorage["yashu:quality"] = "off"` → pure 2D mode (also used by e2e tests).
+    try {
+      setForced2D(window.localStorage.getItem("yashu:quality") === "off");
+    } catch {
+      /* storage blocked */
+    }
+  }, []);
+  const enabled = armed && !forced2D && canRender3D(caps) && !caps.reducedMotion;
   const glReady = useYashu((s) => s.glReady);
   const stealth = useYashu((s) => s.stealth);
   const overdrive = useYashu((s) => s.overdrive);
