@@ -22,6 +22,7 @@ import { ExitIntent } from "@/yashu/ui/ExitIntent";
 import { GesturePanel } from "@/yashu/ui/GesturePanel";
 import { Subtitles } from "@/yashu/ui/Subtitles";
 import { Toasts } from "@/yashu/ui/Toasts";
+import { TourBar } from "@/yashu/ui/TourBar";
 import { VoicePrompt } from "@/yashu/ui/VoicePrompt";
 import { YashuBridge } from "@/yashu/YashuBridge";
 
@@ -56,6 +57,7 @@ export function PortfolioShell() {
         <VoicePrompt ready={ready} />
         <Subtitles />
         <Toasts />
+        <TourBar />
         <EasterEggs />
         <ExitIntent ready={ready} />
         <GesturePanel />
