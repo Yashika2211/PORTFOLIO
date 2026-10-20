@@ -4,7 +4,7 @@ import { PerformanceMonitor, View } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Bloom, ChromaticAberration, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { signals } from "@/yashu/signals";
 import { useYashu } from "@/yashu/store";
@@ -43,6 +43,17 @@ function Effects({ tier }: { tier: Tier }) {
       {vignette}
     </EffectComposer>
   );
+}
+
+/** Flags the store once the first frame is on screen, so the 2D core can fade out. */
+function FirstFrame() {
+  const done = useRef(false);
+  useFrame(() => {
+    if (done.current) return;
+    done.current = true;
+    requestAnimationFrame(() => useYashu.getState().set({ glReady: true }));
+  });
+  return null;
 }
 
 /** Without post-processing, something still has to render the main scene before the Views. */
@@ -106,6 +117,7 @@ export default function SceneRoot({ mobile, lowPower, animate }: { mobile: boole
         onDecline={() => setTier((t) => (Math.max(0, t - 1) as Tier))}
         onFallback={() => setTier(0)}
       >
+        <FirstFrame />
         <CameraRig animate={animate} />
         {/* Space scene pauses (and post-processing drops) while the canvas sits above a briefing. */}
         <group visible={!briefing}>
