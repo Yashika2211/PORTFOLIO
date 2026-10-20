@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import type { Card } from "./conversation";
 import type { SectionId } from "./types";
 
 export type Toast = { id: number; title: string; body: string };
@@ -49,6 +50,14 @@ type State = {
   achievements: string[];
   toasts: Toast[];
   subtitle: Subtitle | null;
+  /** Project the conversation is about ("it", "that one", "next"). */
+  focus: string | null;
+  /** Holographic answer card currently shown. */
+  card: { id: number; card: Card } | null;
+  /** What the assistant is doing right now — drives the dock and the core. */
+  mode: "idle" | "thinking" | "speaking";
+  /** Visible reasoning steps while thinking. */
+  steps: string[];
   /** Bumped to trigger a warp jump to a section. */
   warp: { id: number; target: SectionId } | null;
 };
@@ -67,6 +76,7 @@ type Actions = {
   dismissToast: (id: number) => void;
   say: (text: string, streaming?: boolean) => void;
   warpTo: (target: SectionId) => void;
+  showCard: (card: Card | null) => void;
 };
 
 let seq = 0;
@@ -115,6 +125,10 @@ export const useYashu = create<State & Actions>()(
       toasts: [],
       subtitle: null,
       warp: null,
+      focus: null,
+      card: null,
+      mode: "idle",
+      steps: [],
 
       set: (p) => set(p),
       setVoice: (on) => set({ voice: on }),
@@ -123,6 +137,7 @@ export const useYashu = create<State & Actions>()(
       openCaseFile: (slug, origin = null) =>
         set((s) => ({
           openProject: slug,
+          focus: slug,
           portalOrigin: origin,
           lastProject: slug,
           opened: s.opened.includes(slug) ? s.opened : [...s.opened, slug],
@@ -140,6 +155,7 @@ export const useYashu = create<State & Actions>()(
       dismissToast: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
       say: (text, streaming = false) => set({ subtitle: { id: ++seq, text, streaming } }),
       warpTo: (target) => set({ warp: { id: ++seq, target } }),
+      showCard: (card) => set({ card: card ? { id: ++seq, card } : null }),
     }),
     {
       name: "yashu:state:v1",
@@ -156,6 +172,7 @@ export const useYashu = create<State & Actions>()(
         visited: s.visited,
         opened: s.opened,
         lastProject: s.lastProject,
+        focus: s.focus,
         lastVisit: s.lastVisit,
         achievements: s.achievements,
       }),

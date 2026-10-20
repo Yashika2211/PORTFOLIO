@@ -158,15 +158,20 @@ export async function speakLine(text: string): Promise<Provider | null> {
   say(text);
   if (voice !== true) return null;
   stopSpeaking();
+  const setMode = (mode: "idle" | "speaking") => useYashu.getState().set({ mode });
+  setMode("speaking");
   try {
     if (await premiumAvailable()) {
       if (await speakPremium(text)) return "premium";
     }
+    await speakBrowser(text);
+    return "browser";
   } catch {
-    /* fall through to the browser voice */
+    await speakBrowser(text);
+    return "browser";
+  } finally {
+    setMode("idle");
   }
-  await speakBrowser(text);
-  return "browser";
 }
 
 export function useYashuVoice() {

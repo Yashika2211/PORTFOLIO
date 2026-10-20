@@ -21,6 +21,8 @@ export const signals = {
   scroll: 0,
   /** 0–1 warp streak intensity. */
   warp: 0,
+  /** Assistant is "thinking" — the core spins up. */
+  thinking: false,
   /** Glitch pulse 0–1 (hero return). */
   glitch: 0,
 };
