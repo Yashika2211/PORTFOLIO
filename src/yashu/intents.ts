@@ -18,6 +18,7 @@ export type Action =
   | { type: "mute" }
   | { type: "hire" }
   | { type: "gestures" }
+  | { type: "closeProject" }
   | { type: "none" };
 
 export type Resolution = { intent: string; line: string; action: Action; confidence: number };
@@ -99,6 +100,28 @@ export function findProject(input: string): (typeof projectAliases)[number] | nu
     }
   }
   return best?.p ?? null;
+}
+
+/** Every project mentioned in the input, in the order they appear (for comparisons). */
+export function findProjects(input: string): (typeof projectAliases)[number][] {
+  const hits: { p: (typeof projectAliases)[number]; at: number }[] = [];
+  const words = input.split(" ");
+  for (const p of projectAliases) {
+    let at = -1;
+    for (const w of p.words) {
+      const parts = w.split(" ");
+      if (phraseScore(input, w) >= 1) {
+        const i = input.indexOf(parts[0]);
+        at = Math.max(at, i < 0 ? 0 : i); // fuzzy matches may not appear verbatim
+      }
+      else if (parts.length === 1) {
+        const i = words.findIndex((x) => x.length >= 5 && editDistance(x, w) <= 2);
+        if (i >= 0) at = Math.max(at, input.indexOf(words[i]));
+      }
+    }
+    if (at >= 0) hits.push({ p, at });
+  }
+  return hits.sort((a, b) => a.at - b.at).map((h) => h.p);
 }
 
 const INTENTS: Intent[] = [
