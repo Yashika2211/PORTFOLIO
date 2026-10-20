@@ -38,7 +38,7 @@ function Ring({ radius, speed, tilt, accent, opacity }: { radius: number; speed:
   useFrame((_, dt) => {
     if (!ref.current || !mat.current) return;
     listen.current += ((signals.listening ? 1 : 0) - listen.current) * Math.min(1, dt * 4);
-    ref.current.rotation.z += dt * speed * (1 + signals.voiceLevel * 3 + listen.current);
+    ref.current.rotation.z += dt * speed * (1 + signals.voiceLevel * 3 + listen.current + (signals.thinking ? 3 : 0));
     ref.current.scale.setScalar(1 - listen.current * 0.16);
     mat.current.color.copy(accent ? AMBER : CYAN).lerp(AMBER, listen.current);
   });
@@ -106,8 +106,12 @@ export function ArcCore({ particles = 1400, detail = 20 }: { particles?: number;
     elapsed.current += dt;
     const t = elapsed.current;
 
-    // Voice amplitude while speaking, a slow breath when idle.
-    const target = signals.speaking ? 0.25 + signals.voiceLevel * 0.9 : 0.15 + Math.sin(t * 1.1) * 0.06;
+    // Voice amplitude while speaking, a fast flicker while thinking, a slow breath when idle.
+    const target = signals.speaking
+      ? 0.25 + signals.voiceLevel * 0.9
+      : signals.thinking
+        ? 0.55 + Math.sin(t * 14) * 0.15
+        : 0.15 + Math.sin(t * 1.1) * 0.06;
     signals.energy += (target - signals.energy) * Math.min(1, dt * 10);
     listen.current += ((signals.listening ? 1 : 0) - listen.current) * Math.min(1, dt * 4);
     uniforms.uTime.value = t;
