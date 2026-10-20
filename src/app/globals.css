@@ -480,3 +480,14 @@ html[data-overdrive] {
   from { clip-path: inset(0 100% 0 0); transform: translateX(-6px); }
   to { clip-path: inset(0 0 0 0); transform: none; }
 }
+
+/* ---------- Gesture control ---------- */
+.air-cursor {
+  transition: opacity 0.15s, border-color 0.15s, background-color 0.15s;
+  will-change: transform;
+}
+[data-gesture-hover] {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 4px;
+  box-shadow: 0 0 24px rgb(255 181 71 / 0.45);
+}
