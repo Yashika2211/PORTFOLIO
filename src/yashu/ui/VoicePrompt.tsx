@@ -12,7 +12,13 @@ export function VoicePrompt({ ready }: { ready: boolean }) {
 
   const choose = (on: boolean) => {
     setVoice(on);
-    void speakLine(on ? `Voice interface engaged. ${greeting()}` : "Silent mode. Subtitles only — I'll keep it brief.");
+    // First-visit briefing: the highlights card plus one line on how to drive me.
+    useYashu.getState().showCard({ kind: "briefing" });
+    void speakLine(
+      on
+        ? `Voice interface engaged. ${greeting()} Your briefing is on screen — ask me anything, or say "take the tour".`
+        : "Silent mode. Subtitles only. Your briefing is on screen — type anything to ask me.",
+    );
   };
 
   return (
