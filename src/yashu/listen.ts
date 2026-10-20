@@ -64,6 +64,8 @@ export function startListening(mode: "once" | "wake", onCommand: (text: string) 
       const res = e.results[i];
       if (!res.isFinal) continue;
       const transcript = res[0]?.transcript ?? "";
+      // Don't treat Y.A.S.H.U.'s own voice, picked up by the mic, as a command.
+      if (signals.speaking || Date.now() - signals.spokeAt < 900) continue;
       if (mode === "once") {
         onCommand(transcript);
         continue;

@@ -8,6 +8,8 @@ export const signals = {
   /** 16 frequency bands (0–1) for the equalizer ring. */
   bands: new Float32Array(16),
   speaking: false,
+  /** When Y.A.S.H.U. last stopped speaking (ms) — the mic ignores its own echo. */
+  spokeAt: 0,
   /** Mic is open and listening for a command. */
   listening: false,
   /** 0–1 mic input level, drives the listening waveform. */

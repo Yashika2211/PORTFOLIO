@@ -171,6 +171,7 @@ export async function speakLine(text: string): Promise<Provider | null> {
     return "browser";
   } finally {
     setMode("idle");
+    signals.spokeAt = Date.now();
   }
 }
 
