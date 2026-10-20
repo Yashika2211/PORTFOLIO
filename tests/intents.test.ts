@@ -28,6 +28,7 @@ describe("route — required phrases", () => {
     ["take the tour", { type: "tour" }],
     ["go dark", { type: "stealth" }],
     ["mute", { type: "mute" }],
+    ["change voice", { type: "voiceSettings" }],
   ])("%s", (phrase, action) => {
     expect(act(phrase)).toEqual(action);
   });

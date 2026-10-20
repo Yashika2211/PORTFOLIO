@@ -30,6 +30,8 @@ type State = {
   stealth: boolean;
   /** Gesture-control consent panel is open. */
   gesturePrompt: boolean;
+  /** Voice picker is open. */
+  voiceSettings: boolean;
   /** Bumped to play the celebratory sequence (sudo hire yashika). */
   celebrate: number;
 
@@ -111,6 +113,7 @@ export const useYashu = create<State & Actions>()(
       overdrive: false,
       stealth: false,
       gesturePrompt: false,
+      voiceSettings: false,
       celebrate: 0,
       commandOpen: false,
       openProject: null,

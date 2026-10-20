@@ -27,6 +27,7 @@ import { Subtitles } from "@/yashu/ui/Subtitles";
 import { Toasts } from "@/yashu/ui/Toasts";
 import { TourBar } from "@/yashu/ui/TourBar";
 import { VoicePrompt } from "@/yashu/ui/VoicePrompt";
+import { VoiceSettings } from "@/yashu/ui/VoiceSettings";
 import { YashuBridge } from "@/yashu/YashuBridge";
 
 export function PortfolioShell() {
@@ -64,6 +65,7 @@ export function PortfolioShell() {
         <Awareness ready={ready} />
         <Transitions />
         <VoicePrompt ready={ready} />
+        <VoiceSettings />
         <Subtitles />
         <HoloCard />
         <AssistantDock />

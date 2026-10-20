@@ -98,6 +98,10 @@ export function perform(action: Action) {
     case "closeProject":
       s.closeCaseFile();
       break;
+    case "voiceSettings":
+      s.setCommandOpen(false);
+      s.set({ voiceSettings: true });
+      break;
   }
 }
 

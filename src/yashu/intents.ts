@@ -19,6 +19,7 @@ export type Action =
   | { type: "hire" }
   | { type: "gestures" }
   | { type: "closeProject" }
+  | { type: "voiceSettings" }
   | { type: "none" };
 
 export type Resolution = { intent: string; line: string; action: Action; confidence: number };
@@ -139,6 +140,7 @@ const INTENTS: Intent[] = [
   { id: "tour", phrases: ["take the tour", "guided tour", "tour", "show me around", "walk me through"], resolve: () => ({ line: "Starting the tour. Sit back — any key or scroll hands control back to you.", action: { type: "tour" } }) },
   { id: "mute", phrases: ["mute", "be quiet", "stop talking", "silence", "shut up"], resolve: () => ({ line: "Muted. Subtitles only.", action: { type: "mute" } }) },
   { id: "stealth", phrases: ["go dark", "stealth mode", "lights out", "dark mode"], resolve: () => ({ line: "Going dark. Ambient systems dimmed.", action: { type: "stealth" } }) },
+  { id: "voiceSettings", phrases: ["change voice", "voice settings", "change your voice", "different voice", "choose voice"], resolve: () => ({ line: "Here are the voices I can use on this device. Pick one — I'll say hello in it.", action: { type: "voiceSettings" } }) },
   { id: "gestures", phrases: ["gesture control", "hand gestures", "enable gestures"], resolve: () => ({ line: "Gesture control needs your camera. Video stays on this device — confirm in the panel.", action: { type: "gestures" } }) },
   {
     id: "surprise",
