@@ -79,12 +79,12 @@ function Toggle({ on, label, onClick, disabled, hint }: { on: boolean; label: st
       }}
       disabled={disabled}
       aria-pressed={on}
-      aria-label={hint}
-      title={hint}
+      aria-label={hint ?? label}
+      title={hint ?? `${label} ${on ? "on" : "off"}`}
       className="flex items-center gap-1.5 whitespace-nowrap rounded border border-cyan/30 px-2 py-1 font-mono text-[11px] uppercase tracking-wider text-muted transition hover:border-cyan hover:text-ink disabled:opacity-40 aria-pressed:border-amber/70 aria-pressed:text-amber"
     >
       <span className={`h-1.5 w-1.5 rounded-full ${on ? "bg-amber shadow-[0_0_6px_#ffb547]" : "bg-muted/50"}`} aria-hidden="true" />
-      {label} {on ? "on" : "off"}
+      {label}
     </button>
   );
 }
@@ -185,7 +185,7 @@ export function HudFrame() {
             <button
               type="button"
               onClick={() => setCommandOpen(true)}
-              className="hidden items-center gap-2 whitespace-nowrap rounded border border-cyan/30 px-2 py-1 font-mono text-[11px] text-muted transition hover:border-cyan hover:text-ink sm:flex"
+              className="hidden items-center gap-2 whitespace-nowrap rounded border border-cyan/30 px-2 py-1 font-mono text-[11px] text-muted transition hover:border-cyan hover:text-ink 2xl:flex"
               aria-label="Open command bar"
             >
               Ask <kbd className="rounded bg-cyan/10 px-1 text-cyan">⌘K</kbd>
