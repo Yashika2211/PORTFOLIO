@@ -93,7 +93,7 @@ export function HudFrame() {
   const time = useClock();
   const { pct, active } = useScrollProgress();
   const gh = useGitHub();
-  const { voice, sound, setVoice, toggleSound, setCommandOpen, micOn, listening, set, badges } = useYashu(
+  const { voice, sound, setVoice, toggleSound, setCommandOpen, micOn, listening, set, badges, gestures } = useYashu(
     useShallow((s) => ({
       voice: s.voice,
       sound: s.sound,
@@ -104,6 +104,7 @@ export function HudFrame() {
       listening: s.listening,
       set: s.set,
       badges: s.achievements.filter((a) => ACHIEVEMENTS.some((x) => x.id === a)).length,
+      gestures: s.gestures,
     })),
   );
   const [ttsOk, setTtsOk] = useState(true);
@@ -173,6 +174,12 @@ export function HudFrame() {
             <div className="hidden items-center gap-2 md:flex">
               <Toggle on={voice === true} label="Voice" onClick={() => setVoice(voice !== true)} disabled={!ttsOk} />
               <Toggle on={sound} label="SFX" onClick={toggleSound} />
+              <Toggle
+                on={gestures}
+                label="Hands"
+                hint={`Hand-gesture control (${gestures ? "on" : "off"})`}
+                onClick={() => (gestures ? set({ gestures: false }) : set({ gesturePrompt: true }))}
+              />
               {micOk && <Toggle on={micOn} label="Wake" hint={`Listen for "Hey Yashu" (${micOn ? "on" : "off"})`} onClick={toggleWake} />}
             </div>
             <button
