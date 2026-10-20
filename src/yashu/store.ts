@@ -69,6 +69,19 @@ type Actions = {
 
 let seq = 0;
 
+/**
+ * Writes are ignored until the first rehydrate has read localStorage, so an
+ * early `set()` (e.g. the stage flagging WebGL) can't overwrite saved prefs.
+ */
+let canWrite = false;
+const guardedStorage = {
+  getItem: (k: string) => window.localStorage.getItem(k),
+  setItem: (k: string, v: string) => {
+    if (canWrite) window.localStorage.setItem(k, v);
+  },
+  removeItem: (k: string) => window.localStorage.removeItem(k),
+};
+
 export const useYashu = create<State & Actions>()(
   persist(
     (set, get) => ({
@@ -127,8 +140,11 @@ export const useYashu = create<State & Actions>()(
     }),
     {
       name: "yashu:state:v1",
-      // `window.` keeps the server (Node has its own global localStorage) from touching storage.
-      storage: createJSONStorage(() => window.localStorage),
+      // Guarded and `window.`-scoped: the server (Node has its own global localStorage) never writes.
+      storage: createJSONStorage(() => guardedStorage),
+      onRehydrateStorage: () => () => {
+        canWrite = true;
+      },
       // Rehydrated manually after mount so SSR markup matches the first client render.
       skipHydration: true,
       partialize: (s) => ({
