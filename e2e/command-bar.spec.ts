@@ -8,7 +8,8 @@ test.describe("command bar intents", () => {
 
   async function ask(page: import("@playwright/test").Page, text: string) {
     if (!(await page.getByRole("dialog", { name: /command bar/i }).isVisible())) {
-      await page.getByRole("button", { name: /talk to y\.a\.s\.h\.u\./i }).first().click();
+      // The assistant dock is always reachable; the hero CTA can sit under an answer card on phones.
+    await page.locator("button[aria-haspopup=dialog]").click();
     }
     const input = page.getByLabel("Command or question");
     await input.fill(text);

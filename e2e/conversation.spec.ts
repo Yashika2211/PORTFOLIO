@@ -4,8 +4,13 @@ import { expect, test } from "./fixtures";
 const SLOW = { timeout: 20_000 };
 
 async function ask(page: import("@playwright/test").Page, text: string) {
-  if (!(await page.getByRole("dialog", { name: /command bar/i }).isVisible())) {
-    await page.getByRole("button", { name: /talk to y\.a\.s\.h\.u\./i }).first().click();
+  // On phones the command bar closes when an answer card appears; wait until it's fully gone
+  // (an exiting dialog is a frozen snapshot and can't take input).
+  const bar = page.getByRole("dialog", { name: /command bar/i });
+  if ((page.viewportSize()?.width ?? 1024) < 640) await bar.waitFor({ state: "hidden", timeout: 5000 }).catch(() => {});
+  if (!(await bar.isVisible())) {
+    // The assistant dock is always reachable; the hero CTA can sit under an answer card on phones.
+    await page.locator("button[aria-haspopup=dialog]").click();
   }
   const input = page.getByLabel("Command or question");
   await input.fill(text);
