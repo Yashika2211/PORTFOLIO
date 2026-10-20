@@ -13,8 +13,8 @@ import { useYashu } from "@/yashu/store";
 type LogEntry = { who: "you" | "yashu"; text: string };
 
 export function CommandBar() {
-  const { commandOpen, setCommandOpen, listening } = useYashu(
-    useShallow((s) => ({ commandOpen: s.commandOpen, setCommandOpen: s.setCommandOpen, listening: s.listening })),
+  const { commandOpen, setCommandOpen, listening, steps } = useYashu(
+    useShallow((s) => ({ commandOpen: s.commandOpen, setCommandOpen: s.setCommandOpen, listening: s.listening, steps: s.steps })),
   );
   const [input, setInput] = useState("");
   const [log, setLog] = useState<LogEntry[]>([
@@ -115,6 +115,17 @@ export function CommandBar() {
                     {m.text}
                   </p>
                 ))}
+                {steps.length > 0 && (
+                  <p className="text-cyan/80" aria-hidden="true">
+                    <span className="mr-2 text-muted">yashu &gt;</span>
+                    {steps.map((s, i) => (
+                      <span key={s} className="holo-row mr-2 inline-block">
+                        {i === steps.length - 1 ? "▸" : "✓"} {s}
+                        {i === steps.length - 1 && "…"}
+                      </span>
+                    ))}
+                  </p>
+                )}
               </div>
 
               <form
