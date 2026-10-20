@@ -40,12 +40,14 @@ function Toast({ id, title, body }: { id: number; title: string; body: string })
 export function Toasts() {
   const toasts = useYashu((s) => s.toasts);
   return (
-    <ol role="status" aria-live="polite" className="pointer-events-none fixed right-4 top-20 z-[75] flex flex-col gap-2 sm:right-8">
-      <AnimatePresence initial={false}>
-        {toasts.map((t) => (
-          <Toast key={t.id} {...t} />
-        ))}
-      </AnimatePresence>
-    </ol>
+    <div role="status" aria-live="polite" className="pointer-events-none fixed right-4 top-20 z-[75] sm:right-8">
+      <ol className="flex flex-col gap-2">
+        <AnimatePresence initial={false}>
+          {toasts.map((t) => (
+            <Toast key={t.id} {...t} />
+          ))}
+        </AnimatePresence>
+      </ol>
+    </div>
   );
 }

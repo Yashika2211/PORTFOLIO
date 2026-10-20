@@ -104,7 +104,6 @@ export function Skills() {
                         onClick={() => set({ pinnedSkill: pinned === s ? null : s })}
                         aria-pressed={pinned === s}
                         onBlur={() => setActiveSkill(null)}
-                        aria-label={count ? `${s} — used in ${count} featured project${count > 1 ? "s" : ""}` : s}
                         className={`rounded-md border px-3 py-1.5 text-sm transition ${
                           active
                             ? "border-amber bg-amber/10 text-ink shadow-[0_0_14px_rgba(255,181,71,0.35)]"
@@ -112,7 +111,17 @@ export function Skills() {
                         }`}
                       >
                         {s}
-                        {count > 0 && <span className="ml-1.5 font-mono text-[10px] text-cyan">{count}</span>}
+                        {count > 0 && (
+                          <>
+                            <span className="ml-1.5 font-mono text-[10px] text-cyan" aria-hidden="true">
+                              {count}
+                            </span>
+                            <span className="sr-only">
+                              {" "}
+                              — used in {count} featured project{count > 1 ? "s" : ""}
+                            </span>
+                          </>
+                        )}
                       </button>
                     </li>
                   );

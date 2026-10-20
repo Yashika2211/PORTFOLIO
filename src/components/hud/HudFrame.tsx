@@ -79,7 +79,7 @@ function Toggle({ on, label, onClick, disabled, hint }: { on: boolean; label: st
       }}
       disabled={disabled}
       aria-pressed={on}
-      aria-label={hint ?? label}
+      aria-label={hint ? `${label} — ${hint}` : label}
       title={hint ?? `${label} ${on ? "on" : "off"}`}
       className="flex items-center gap-1.5 whitespace-nowrap rounded border border-cyan/30 px-2 py-1 font-mono text-[11px] uppercase tracking-wider text-muted transition hover:border-cyan hover:text-ink disabled:opacity-40 aria-pressed:border-amber/70 aria-pressed:text-amber"
     >
@@ -144,7 +144,7 @@ export function HudFrame() {
             type="button"
             onClick={() => scrollToSection("hero")}
             className="font-display text-sm font-bold tracking-[0.25em] text-cyan text-glow"
-            aria-label="Back to top"
+            aria-label={`${assistant.name} — back to top`}
           >
             {assistant.name}
           </button>
@@ -177,10 +177,10 @@ export function HudFrame() {
               <Toggle
                 on={gestures}
                 label="Hands"
-                hint={`Hand-gesture control (${gestures ? "on" : "off"})`}
+                hint="hand-gesture control"
                 onClick={() => (gestures ? set({ gestures: false }) : set({ gesturePrompt: true }))}
               />
-              {micOk && <Toggle on={micOn} label="Wake" hint={`Listen for "Hey Yashu" (${micOn ? "on" : "off"})`} onClick={toggleWake} />}
+              {micOk && <Toggle on={micOn} label="Wake" hint={"listen for \u201cHey Yashu\u201d"} onClick={toggleWake} />}
             </div>
             <button
               type="button"
