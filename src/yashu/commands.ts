@@ -1,6 +1,8 @@
 "use client";
 
-import { route, type Action } from "./intents";
+import { respond } from "./conversation";
+import { type Action } from "./intents";
+import { signals } from "./signals";
 import { useYashu } from "./store";
 import { speakLine, stopSpeaking } from "./voice";
 import { startTour } from "./tour";
@@ -93,7 +95,25 @@ export function perform(action: Action) {
     case "gestures":
       s.set({ gesturePrompt: true });
       break;
+    case "closeProject":
+      s.closeCaseFile();
+      break;
   }
+}
+
+/** Show reasoning steps while the core spins up — brief, and skipped under reduced motion. */
+async function think(steps: string[] | undefined) {
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!steps?.length || reduced) return;
+  const s = useYashu.getState();
+  s.set({ mode: "thinking", steps: [] });
+  signals.thinking = true;
+  for (const step of steps.slice(0, 4)) {
+    useYashu.getState().set({ steps: [...useYashu.getState().steps, step] });
+    await new Promise((r) => setTimeout(r, 260));
+  }
+  signals.thinking = false;
+  useYashu.getState().set({ mode: "idle", steps: [] });
 }
 
 /** Run a typed or spoken command end to end. Returns the line Y.A.S.H.U. said. */
@@ -101,9 +121,10 @@ export async function runCommand(input: string, source: "typed" | "voice" = "typ
   const s = useYashu.getState();
   if (source === "voice") s.unlock("talker", "Talker", "Used a voice command.");
 
-  const r = route(input);
+  const r = respond(input, { focus: s.focus, section: s.currentSection, openProject: s.openProject });
   if (r.intent === "fallback" && input.trim().split(/\s+/).length >= 3 && (await llmAvailable())) {
     try {
+      await think(["consulting the knowledge core"]);
       const answer = await askLLM(input);
       if (answer) {
         void speakLine(answer);
@@ -113,6 +134,9 @@ export async function runCommand(input: string, source: "typed" | "voice" = "typ
       /* fall back to the router's witty line */
     }
   }
+  await think(r.steps);
+  if (r.focus !== undefined) useYashu.getState().set({ focus: r.focus });
+  if (r.card) useYashu.getState().showCard(r.card);
   void speakLine(r.line);
   perform(r.action);
   return r.line;
