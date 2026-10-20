@@ -22,7 +22,10 @@ export function Director({ ready }: { ready: boolean }) {
     const s = useYashu.getState();
     if (s.voice !== null) {
       const line = s.lastVisit ? returningGreeting(s.lastProject) : greeting();
-      window.setTimeout(() => void speakLine(line), 900);
+      window.setTimeout(() => {
+        // Don't talk over a visitor who has already issued a command.
+        if (!useYashu.getState().subtitle) void speakLine(line);
+      }, 900);
     }
     s.set({ lastVisit: Date.now() });
     const h = new Date().getHours();
