@@ -23,6 +23,7 @@ const heroLook = new THREE.Vector3(0, 0, 0);
 /** Scroll-driven camera path through the holographic space. */
 export function CameraRig({ animate }: { animate: boolean }) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
+  const size = useThree((s) => s.size);
   const curve = useMemo(() => new THREE.CatmullRomCurve3(WAYPOINTS.map((p) => new THREE.Vector3(...p)), false, "centripetal"), []);
   const t = useRef(0);
   const shake = useRef(0);
@@ -53,8 +54,11 @@ export function CameraRig({ animate }: { animate: boolean }) {
     camera.lookAt(look);
 
     const fov = 45 + signals.warp * 30;
-    if (Math.abs(camera.fov - fov) > 0.01) {
+    // drei <View>s can leave their aspect on the shared camera; re-assert the canvas aspect.
+    const aspect = size.width / size.height;
+    if (Math.abs(camera.fov - fov) > 0.01 || camera.aspect !== aspect) {
       camera.fov += (fov - camera.fov) * Math.min(1, dt * 8);
+      camera.aspect = aspect;
       camera.updateProjectionMatrix();
     }
     signals.glitch = Math.max(0, signals.glitch - dt * 2.5);
