@@ -87,14 +87,14 @@ export function AssistantDock() {
           ))}
         </ol>
       )}
-      <div className="flex flex-col items-end gap-1.5">
+      <div className="flex items-end gap-2">
         {micOk && (
           <button
             type="button"
             onClick={() => (listening ? stopListening() : startListening("once", (t) => void runCommand(t, "voice")))}
             aria-pressed={listening}
             aria-label={listening ? "Stop listening" : `Speak to ${assistant.name}`}
-            className={`flex h-9 w-9 items-center justify-center self-center rounded-full border backdrop-blur transition ${
+            className={`mb-3 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur transition ${
               listening ? "border-amber bg-amber/20 text-amber" : "border-cyan/40 bg-void/70 text-cyan hover:bg-cyan/10"
             }`}
           >
