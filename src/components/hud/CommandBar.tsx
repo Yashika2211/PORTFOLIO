@@ -32,6 +32,9 @@ export function CommandBar() {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setCommandOpen(!useYashu.getState().commandOpen);
+      } else if (e.key === "Escape" && useYashu.getState().commandOpen) {
+        // Close from anywhere, not only while focus is inside the dialog.
+        setCommandOpen(false);
       }
     };
     window.addEventListener("keydown", onKey);
