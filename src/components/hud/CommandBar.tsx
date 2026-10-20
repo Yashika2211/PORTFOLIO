@@ -13,8 +13,8 @@ import { useYashu } from "@/yashu/store";
 type LogEntry = { who: "you" | "yashu"; text: string };
 
 export function CommandBar() {
-  const { commandOpen, setCommandOpen, listening, steps } = useYashu(
-    useShallow((s) => ({ commandOpen: s.commandOpen, setCommandOpen: s.setCommandOpen, listening: s.listening, steps: s.steps })),
+  const { commandOpen, setCommandOpen, listening, steps, heard } = useYashu(
+    useShallow((s) => ({ commandOpen: s.commandOpen, setCommandOpen: s.setCommandOpen, listening: s.listening, steps: s.steps, heard: s.heard })),
   );
   const [input, setInput] = useState("");
   const [log, setLog] = useState<LogEntry[]>([
@@ -115,6 +115,12 @@ export function CommandBar() {
                     {m.text}
                   </p>
                 ))}
+                {listening && (
+                  <p className="text-amber" aria-live="polite">
+                    <span className="mr-2 text-muted">you &gt;</span>
+                    {heard ? `${heard}…` : "listening — speak now…"}
+                  </p>
+                )}
                 {steps.length > 0 && (
                   <p className="text-cyan/80" aria-hidden="true">
                     <span className="mr-2 text-muted">yashu &gt;</span>

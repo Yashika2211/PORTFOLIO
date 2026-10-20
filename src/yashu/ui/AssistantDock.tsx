@@ -68,8 +68,17 @@ const LABEL = { idle: "online", thinking: "processing", speaking: "speaking" } a
 
 /** Persistent assistant presence: state, reasoning steps, one-tap mic and the command bar. */
 export function AssistantDock() {
-  const { mode, steps, listening, followUp, setCommandOpen } = useYashu(
-    useShallow((s) => ({ mode: s.mode, steps: s.steps, listening: s.listening, followUp: s.followUp, setCommandOpen: s.setCommandOpen })),
+  const { mode, steps, listening, followUp, heard, micError, setCommandOpen, set } = useYashu(
+    useShallow((s) => ({
+      mode: s.mode,
+      steps: s.steps,
+      listening: s.listening,
+      followUp: s.followUp,
+      heard: s.heard,
+      micError: s.micError,
+      setCommandOpen: s.setCommandOpen,
+      set: s.set,
+    })),
   );
   const [micOk, setMicOk] = useState(false);
   useEffect(() => setMicOk(micSupported()), []);
@@ -77,6 +86,23 @@ export function AssistantDock() {
 
   return (
     <div className="fixed bottom-4 right-4 z-[66] flex items-end gap-2 md:bottom-10 md:right-8">
+      {(listening || micError) && (
+        <div className="glass mb-2 max-w-[min(280px,calc(100vw-140px))] px-3 py-2 text-xs" role={micError ? "alert" : undefined}>
+          {micError ? (
+            <p className="flex items-start gap-2 text-amber">
+              <span className="flex-1">{micError}</span>
+              <button type="button" onClick={() => set({ micError: null })} className="text-muted hover:text-ink" aria-label="Dismiss microphone message">
+                ✕
+              </button>
+            </p>
+          ) : (
+            <p className="font-mono text-cyan" aria-live="polite">
+              <span className="pulse-dot mr-1.5 inline-block h-2 w-2 rounded-full bg-amber align-middle" aria-hidden="true" />
+              {heard ? <span className="text-ink">&ldquo;{heard}&rdquo;</span> : "Listening — speak now…"}
+            </p>
+          )}
+        </div>
+      )}
       {steps.length > 0 && (
         <ol className="glass mb-2 hidden max-w-[240px] px-3 py-2 font-mono text-[11px] text-cyan sm:block" aria-hidden="true">
           {steps.map((s, i) => (
