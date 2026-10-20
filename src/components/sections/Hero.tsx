@@ -10,19 +10,21 @@ import { scrollToSection } from "@/components/providers/SmoothScroll";
 /** Staggered HUD entrance delay; the animation lives in .hud-in (globals.css). */
 const d = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
 
-export function Hero({ ready }: { ready: boolean }) {
+export function Hero({ ready, entrance }: { ready: boolean; entrance: boolean }) {
   const setCommandOpen = useYashu((s) => s.setCommandOpen);
   // The 3D core lives in the shared scene (src/scenes); show the 2D core otherwise.
-  const gl3d = useYashu((s) => s.gl3d);
+  const glReady = useYashu((s) => s.glReady);
 
   return (
     <section id="hero" aria-labelledby="hero-title" className="relative flex min-h-[100svh] items-center overflow-hidden pt-24">
       <div className="pointer-events-none absolute inset-0 max-md:opacity-60">
-        {!gl3d && <StaticCore />}
+        <div className={`transition-opacity duration-700 ${glReady ? "opacity-0" : "opacity-100"}`}>
+          <StaticCore />
+        </div>
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-8">
-        <div className="max-w-2xl" data-play={ready}>
+        <div className="max-w-2xl" data-play={ready && entrance}>
           <p className="hud-in hud-label flicker mb-5 flex items-center gap-2" style={d(0.1)}>
             <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-amber" aria-hidden="true" />
             {assistant.name} {"//"} {assistant.expansion}
@@ -33,7 +35,7 @@ export function Hero({ ready }: { ready: boolean }) {
             className="hud-in font-display text-[2.6rem] font-black uppercase leading-[0.95] tracking-wide text-ink text-glow sm:text-7xl lg:text-8xl"
             style={d(0.2)}
           >
-            <ScrambleText key={String(ready)} text={profile.name} duration={1400} delay={250} />
+            <ScrambleText key={String(ready && entrance)} text={profile.name} duration={1400} delay={250} />
           </h1>
 
           <p className="hud-in mt-6 max-w-xl text-lg text-ink/90 sm:text-xl" style={d(0.45)}>

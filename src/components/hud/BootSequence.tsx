@@ -7,7 +7,7 @@ import { playSound } from "@/lib/sound";
 
 const LINE_MS = 430;
 
-export function BootSequence({ onDone }: { onDone?: () => void }) {
+export function BootSequence({ onDone }: { onDone?: (played: boolean) => void }) {
   const [visible, setVisible] = useState(true);
   const [lines, setLines] = useState(0);
   const [leaving, setLeaving] = useState(false);
@@ -22,14 +22,14 @@ export function BootSequence({ onDone }: { onDone?: () => void }) {
     window.setTimeout(() => {
       document.documentElement.classList.add("booted");
       setVisible(false);
-      onDone?.();
+      onDone?.(true);
     }, 450);
   }, [onDone]);
 
   useEffect(() => {
     if (document.documentElement.classList.contains("booted")) {
       setVisible(false);
-      onDone?.();
+      onDone?.(false);
       return;
     }
     playSound("boot");

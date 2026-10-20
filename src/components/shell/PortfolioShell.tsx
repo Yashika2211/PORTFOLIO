@@ -28,7 +28,12 @@ import { YashuBridge } from "@/yashu/YashuBridge";
 
 export function PortfolioShell() {
   const [ready, setReady] = useState(false);
-  const onBooted = useCallback(() => setReady(true), []);
+  // Replay the hero entrance only after a boot sequence actually played.
+  const [entrance, setEntrance] = useState(false);
+  const onBooted = useCallback((played: boolean) => {
+    setEntrance(played);
+    setReady(true);
+  }, []);
 
   return (
     <>
@@ -43,7 +48,7 @@ export function PortfolioShell() {
         <Cursor />
         <CommandBar />
         <main id="main" className="scanlines relative">
-          <Hero ready={ready} />
+          <Hero ready={ready} entrance={entrance} />
           <About />
           <Skills />
           <Projects />
