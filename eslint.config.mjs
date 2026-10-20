@@ -18,7 +18,14 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "test-results/**",
+      "playwright-report/**",
     ],
+  },
+  {
+    // Playwright fixtures call their callback `use`, which isn't React's hook.
+    files: ["e2e/**"],
+    rules: { "react-hooks/rules-of-hooks": "off" },
   },
 ];
 
