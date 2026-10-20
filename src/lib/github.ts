@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { githubFallback, profile } from "@/data/portfolio";
+import { githubFallback } from "@/data/portfolio";
 
 export type RepoPush = { name: string; pushedAt: string; url: string };
 export type GitHubSnapshot = {
@@ -36,23 +36,11 @@ const fallback: GitHubSnapshot = {
   source: "fallback",
 };
 
-async function fetchLive(signal: AbortSignal): Promise<Omit<GitHubSnapshot, "source">> {
-  const base = `https://api.github.com/users/${profile.githubUser}`;
-  const headers = { Accept: "application/vnd.github+json" };
-  const [userRes, reposRes] = await Promise.all([
-    fetch(base, { signal, headers }),
-    fetch(`${base}/repos?sort=pushed&per_page=6`, { signal, headers }),
-  ]);
-  if (!userRes.ok || !reposRes.ok) throw new Error(`github ${userRes.status}/${reposRes.status}`);
-  const user = (await userRes.json()) as { public_repos: number };
-  const repos = (await reposRes.json()) as { name: string; pushed_at: string; html_url: string; fork: boolean }[];
-  return {
-    publicRepos: user.public_repos,
-    recent: repos
-      .filter((r) => !r.fork)
-      .slice(0, 3)
-      .map((r) => ({ name: r.name, pushedAt: r.pushed_at, url: r.html_url })),
-  };
+async function fetchLive(signal: AbortSignal): Promise<Omit<GitHubSnapshot, "source"> & { source: GitHubSnapshot["source"] }> {
+  // Our cached server proxy (src/app/api/github) — never GitHub directly.
+  const res = await fetch("/api/github", { signal });
+  if (!res.ok) throw new Error(String(res.status));
+  return (await res.json()) as GitHubSnapshot;
 }
 
 /** Live GitHub stats: cache first, then network, then static fallback. */
@@ -67,8 +55,8 @@ export function useGitHub(): GitHubSnapshot {
     const ctrl = new AbortController();
     fetchLive(ctrl.signal)
       .then((data) => {
-        writeCache(data);
-        setSnap({ ...data, source: "live" });
+        if (data.source === "live") writeCache(data);
+        setSnap(data);
       })
       .catch(() => {
         /* rate-limited or offline: keep cache/fallback */
