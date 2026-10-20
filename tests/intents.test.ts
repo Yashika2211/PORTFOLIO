@@ -12,6 +12,16 @@ describe("normalize / stripWake", () => {
     expect(stripWake("hey yashoo show projects").woke).toBe(true);
     expect(stripWake("show projects").woke).toBe(false);
   });
+  it("tolerates common mis-hearings of the wake phrase", () => {
+    for (const heard of ["hey Joshua open haggle", "hey you shoe open haggle", "a ashu open haggle", "hey yash you open haggle", "Yashu, open Haggle", "hey yeshu open haggle", "okay yasho open haggle"]) {
+      expect(stripWake(heard)).toEqual({ text: "open haggle", woke: true });
+    }
+  });
+  it("doesn't wake on ordinary sentences", () => {
+    for (const heard of ["show me the projects", "hey there", "yes show projects", "open haggle", "hey what is this"]) {
+      expect(stripWake(heard).woke).toBe(false);
+    }
+  });
   it("computes edit distance", () => {
     expect(editDistance("haggle", "haggel")).toBe(2);
     expect(editDistance("tour", "tour")).toBe(0);

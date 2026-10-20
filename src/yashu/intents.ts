@@ -45,10 +45,31 @@ export function normalize(s: string): string {
 }
 
 /** Strips the "hey yashu" wake phrase (and common mis-hearings). */
+// How speech engines commonly hear "Yashu" (checked as whole tokens, joined).
+const WAKE_NAMES = new Set([
+  "yashu", "yashoo", "yasu", "yahshu", "yeshu", "yaashu", "yashuu", "yasho", "yesu", "jashu", "jesu", "ashu", "aashu",
+  "joshua", "yashwe", "yasshu", "yeshoo", "yaashoo", "yoshu", "yushu",
+  "yashyou", "youshoe", "yashoe", "yeahshoe", "yesshoe", "yashew", "joshyou", "yashua", "yashi",
+]);
+const GREETINGS = new Set(["hey", "hi", "ok", "okay", "hay", "he", "a", "yo", "hello", "oi"]);
+
+/**
+ * Detects and strips the "Hey Yashu" wake phrase, tolerating mis-hearings
+ * ("hey Joshua", "hey you shoe", "a ashu"). The name must come first (after an
+ * optional greeting) so ordinary sentences don't wake it.
+ */
 export function stripWake(s: string): { text: string; woke: boolean } {
   const n = normalize(s);
-  const m = n.match(/^(hey|hi|ok|okay)?\s*(yashu|yashoo|yasu|yahshu|yeshu|yaashu|yash you)\b\s*/);
-  return m ? { text: n.slice(m[0].length).trim(), woke: true } : { text: n, woke: false };
+  const words = n.split(" ").filter(Boolean);
+  let i = 0;
+  if (words[0] && GREETINGS.has(words[0])) i = 1;
+  for (const span of [2, 1]) {
+    const name = words.slice(i, i + span).join("");
+    if (!name) continue;
+    const close = WAKE_NAMES.has(name) || (name.length >= 4 && name.length <= 7 && editDistance(name, "yashu") <= (i ? 2 : 1));
+    if (close) return { text: words.slice(i + span).join(" "), woke: true };
+  }
+  return { text: n, woke: false };
 }
 
 export function editDistance(a: string, b: string): number {
