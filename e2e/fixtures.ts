@@ -5,8 +5,9 @@ export const test = base.extend<{ page: Page }>({
   page: async ({ page }, use) => {
     await page.addInitScript(() => {
       localStorage.setItem("yashu:booted:v1", "1");
-      // Software WebGL in CI is slow; start the scene on its minimal tier.
-      localStorage.setItem("yashu:quality", "low");
+      // Software WebGL in CI starves the main thread; behaviour tests run in 2D mode.
+      // e2e/webgl.spec.ts covers the 3D stage itself.
+      if (!localStorage.getItem("yashu:quality")) localStorage.setItem("yashu:quality", "off");
       localStorage.setItem(
         "yashu:state:v1",
         JSON.stringify({ state: { voice: false, sound: false, visited: [], opened: [], lastProject: null, lastVisit: null, achievements: [] }, version: 0 }),
