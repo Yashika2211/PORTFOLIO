@@ -26,8 +26,9 @@ export function Experience() {
           },
         );
         gsap.utils.toArray<HTMLElement>(".log-entry").forEach((el) => {
+          // Vertical entrance: a horizontal offset would widen the mobile layout viewport.
           gsap.from(el, {
-            x: 40,
+            y: 40,
             opacity: 0,
             duration: 0.7,
             ease: "power3.out",
