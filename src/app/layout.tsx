@@ -64,6 +64,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootGateScript }} />
+        <noscript>
+          <style>{`.boot-overlay{display:none!important}`}</style>
+        </noscript>
       </head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }} />
