@@ -44,13 +44,20 @@ Drop your PDF at **`public/Yashika_Bhatia_Resume.pdf`**, keeping that exact file
 | Feature | Where | Toggle / how to turn it off | Fallback |
 |---|---|---|---|
 | **Boot sequence** (scan line, typed boot log, particle assembly) | `components/hud/BootSequence.tsx` | Skippable (button, Esc or Enter); shown once, remembered in `localStorage["yashu:booted:v1"]` | Skipped under reduced motion; a CSS failsafe hides it after 6s if JS fails |
-| **Single shared WebGL stage**: arc core, starfield, gates, scroll camera path | `src/scenes/SceneRoot.tsx`, `Stage.tsx` | Automatic. Pin the minimal tier with `localStorage["yashu:quality"]="low"` | No WebGL, low-power device or reduced motion → 2D SVG/CSS core, same content |
+| **Single shared WebGL stage**: arc core, starfield, gates, scroll camera path | `src/scenes/SceneRoot.tsx`, `Stage.tsx` | Automatic. Pin the minimal tier with `localStorage["yashu:quality"]="low"`, or force pure 2D with `"off"` | No WebGL, low-power device or reduced motion → 2D SVG/CSS core, same content |
 | **Auto quality** (drei `PerformanceMonitor`: particles, post-processing, DPR) | `SceneRoot.tsx` | Automatic | Drops to the minimal tier when FPS falls |
 | **Audio-reactive core**: shader, ring speed, EQ ring follow the voice; amber and contracted while listening | `scenes/core/*`, `yashu/audio.ts` | Follows voice and mic state | Idle breathing pulse |
 | **Voice output** (`useYashuVoice`) | `yashu/voice.ts` | **Off until opt-in**: ENGAGE / SILENT MODE prompt, then the *Voice* HUD toggle, or say "mute" | Every line is always shown as a subtitle and announced via `aria-live` |
 | **Premium voice** (ElevenLabs / OpenAI TTS) | `app/api/tts/route.ts` | Set `TTS_PROVIDER` + `TTS_API_KEY` | No key → browser `speechSynthesis`, silently |
 | **Voice input + "Hey Yashu" wake phrase** | `yashu/listen.ts` | Mic button in the command bar (one command); *Wake* HUD toggle (always-on, wake phrase required) | Hidden where `SpeechRecognition` is unsupported |
-| **Command bar** (Cmd/Ctrl+K, fuzzy intents) | `components/hud/CommandBar.tsx`, `yashu/intents.ts` | Always available; floating button on mobile | Deterministic, offline, no keys |
+| **Command bar** (Cmd/Ctrl+K, fuzzy intents) | `components/hud/CommandBar.tsx`, `yashu/intents.ts` | Always available | Deterministic, offline, no keys |
+| **Conversation memory**: follow-ups like "what's it built with?", "the numbers?", "next one", "open it", "compare it with CodeNation", "close" | `yashu/conversation.ts` | Always on | Pure and unit-tested; no keys |
+| **Holographic answer cards**: project stack, numbers, problem; comparisons; "why hire her" pitch; briefing; location | `yashu/ui/HoloCard.tsx` | Auto-dismiss after 22s (paused on hover), ✕ or Esc | Text answer is always spoken and subtitled too |
+| **Assistant dock**: live waveform orb with online / processing / speaking / listening / "go ahead" states, reasoning steps, one-tap mic | `yashu/ui/AssistantDock.tsx` | Always visible; click it to open the command bar | Static orb under reduced motion |
+| **Thinking phase**: reasoning steps play while the core spins up | `yashu/commands.ts` | Automatic, under 1s | Skipped under reduced motion |
+| **Situational awareness**: notices when you linger on a case file, skim fast, hover the resume, return to the tab, open your first briefing | `yashu/Awareness.tsx` | At most 1 remark per 25s and 6 per visit; silent during tours, dialogs and "go dark" | — |
+| **Conversation mode**: after an answer, follow-ups need no wake phrase for 10s (ignores its own voice echo) | `yashu/listen.ts` | Part of the *Wake* toggle | — |
+| **Local diagnostics**: "run diagnostics" scans display, compute, graphics, network and locale | `yashu/ui/HoloCard.tsx` | On request only | Nothing is transmitted |
 | **LLM brain** (free-form questions, answers only from `portfolio.ts`, streamed) | `app/api/ask/route.ts` | Set `LLM_API_KEY` (Anthropic) | No key → witty intent-router fallback |
 | **Personality**: time-aware and returning-visitor greetings, idle nudges, section narration | `yashu/Director.tsx`, `lines.ts` | Narration is spoken only when voice is on | Subtitles only |
 | **Guided tour** (~75s narrated autopilot) | `yashu/tour.ts`, `ui/TourBar.tsx` | Say or type "take the tour"; any scroll, key or click hands back control; *exit* button | Works without WebGL (scroll + subtitles) |
@@ -59,7 +66,7 @@ Drop your PDF at **`public/Yashika_Bhatia_Resume.pdf`**, keeping that exact file
 | **3D architecture** in briefings, with parallax (mouse or device tilt) | `scenes/views/ArchScene.tsx`, `yashu/tilt.ts` | Tilt is opt-in ("Enable tilt parallax"; iOS permission prompt) | Animated SVG diagram |
 | **Skill constellation** (drag to rotate, click to trace beams to projects) | `scenes/views/ConstellationScene.tsx` | Click a node or chip to pin, again to clear | SVG orbits + chips |
 | **Holographic ID card** (iridescent foil shader, QR back → resume) | `scenes/views/IdCardScene.tsx` | Click to flip | CSS 3D flip card |
-| **Hand gestures** (MediaPipe: palm = pause, swipe = section, pinch = open) | `yashu/gestures.ts`, `ui/GesturePanel.tsx` | **Off by default**. *Hands* HUD toggle, or say "gesture control". Camera consent required; *stop ✕* turns it off | Video never leaves the device; nothing loads until consent |
+| **Hand gestures** (MediaPipe GestureRecognizer): ☝️ point = air cursor · 🤏 pinch = click · ✊ fist = grab & scroll · 🖐 hold = pause, swipe = next/prev section · 👍 hold = open · ✌️ hold = tour | `yashu/gestures.ts`, `ui/GesturePanel.tsx` | **Off by default**. *Hands* HUD toggle, or say "gesture control". Camera consent required; *cam* hides the preview; *stop ✕* turns it off | Video never leaves the device; nothing loads until consent |
 | **Custom cursor** (energy ring, particle ribbon, magnetic snap, lock-on brackets) | `components/hud/Cursor.tsx` | Fine pointers only | Native cursor on touch and under reduced motion |
 | **Sound design** (procedural hum, blips, whoosh, shimmer; no audio files) | `lib/sound.ts` | **Off by default**. *SFX* HUD toggle; "go dark" also silences | — |
 | **Achievements** (Explorer, Deep diver, Talker, Night owl, Tourist, Root access, Overdrive → secret) | `yashu/achievements.ts`, `ui/Toasts.tsx` | Persisted in `localStorage["yashu:state:v1"]`; clear site data to reset | Toasts announced politely |
@@ -70,9 +77,11 @@ Drop your PDF at **`public/Yashika_Bhatia_Resume.pdf`**, keeping that exact file
 
 ### Commands to try
 
-`show projects` · `open Haggle` · `what's her best project` · `experience` · `skills in AI` · `download resume` · `contact` · `take the tour` · `go dark` · `surprise me` · `who are you` · `mute` · `gesture control` · `sudo hire yashika`
+`brief me` · `open Haggle` → `what's it built with?` → `and the numbers?` → `next one` · `compare Haggle and CodeNation` · `why should I hire her` · `run diagnostics` · `what am I looking at` · `show projects` · `what's her best project` · `experience` · `skills in AI` · `download resume` · `contact` · `take the tour` · `go dark` · `surprise me` · `who are you` · `mute` · `gesture control` · `sudo hire yashika`
 
 ## Environment variables
+
+**Gesture tips:** keep your hand about 50 cm from the camera in good light. Labels must hold for a few frames before they count, the cursor is One-Euro filtered, pinch uses hysteresis, and hold gestures show a progress ring.
 
 Copy `.env.example` to `.env.local`. **All are optional, and every secret stays server-side**: nothing is exposed with a `NEXT_PUBLIC_` prefix except the two public values below.
 
