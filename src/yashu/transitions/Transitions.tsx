@@ -88,16 +88,17 @@ export function Transitions() {
 
   // Drive the DOM streak overlay from the shared warp signal.
   useEffect(() => {
-    if (!warpOn) return;
+    const el = streaks.current;
+    if (!warpOn || !el) return;
     let raf = 0;
     const tick = () => {
-      if (streaks.current) streaks.current.style.opacity = String(signals.warp * 0.9);
+      el.style.opacity = String(signals.warp * 0.9);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
-      if (streaks.current) streaks.current.style.opacity = "0";
+      el.style.opacity = "0";
     };
   }, [warpOn]);
 
