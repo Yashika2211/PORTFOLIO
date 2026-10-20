@@ -15,6 +15,7 @@ import { ProjectBriefing } from "@/components/sections/ProjectBriefing";
 import { Projects } from "@/components/sections/Projects";
 import { Skills } from "@/components/sections/Skills";
 import { Stage } from "@/scenes/Stage";
+import { Awareness } from "@/yashu/Awareness";
 import { Director } from "@/yashu/Director";
 import { Transitions } from "@/yashu/transitions/Transitions";
 import { EasterEggs } from "@/yashu/ui/EasterEggs";
@@ -60,6 +61,7 @@ export function PortfolioShell() {
         </main>
         <ProjectBriefing />
         <Director ready={ready} />
+        <Awareness ready={ready} />
         <Transitions />
         <VoicePrompt ready={ready} />
         <Subtitles />
