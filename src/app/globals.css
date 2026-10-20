@@ -285,12 +285,13 @@ html.booted .boot-overlay {
 [data-play="true"] .hud-in {
   animation: hud-in 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0s) both;
 }
+/* Clip-path wipe + transform glitch only: text never drops below full contrast. */
 @keyframes hud-in {
-  0% { opacity: 0; transform: translateY(18px); filter: blur(6px); }
-  55% { opacity: 0.85; transform: translate(-2px, 2px); filter: blur(0); }
-  62% { opacity: 0.3; }
-  70% { opacity: 1; transform: translate(1px, 0); }
-  100% { opacity: 1; transform: none; filter: none; }
+  0% { clip-path: inset(0 100% 0 0); transform: translateY(14px); }
+  55% { clip-path: inset(0 0 0 0); transform: translate(-2px, 2px); }
+  62% { clip-path: inset(0 0 40% 0); transform: translate(2px, -1px); }
+  70% { clip-path: inset(0 0 0 0); transform: translate(1px, 0); }
+  100% { clip-path: inset(0 0 0 0); transform: none; }
 }
 
 /* ---------- Fan chart & architecture draw-in ---------- */
