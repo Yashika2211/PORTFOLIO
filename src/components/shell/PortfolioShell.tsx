@@ -20,6 +20,7 @@ import { Transitions } from "@/yashu/transitions/Transitions";
 import { EasterEggs } from "@/yashu/ui/EasterEggs";
 import { ExitIntent } from "@/yashu/ui/ExitIntent";
 import { GesturePanel } from "@/yashu/ui/GesturePanel";
+import { AssistantDock } from "@/yashu/ui/AssistantDock";
 import { HoloCard } from "@/yashu/ui/HoloCard";
 import { Subtitles } from "@/yashu/ui/Subtitles";
 import { Toasts } from "@/yashu/ui/Toasts";
@@ -63,6 +64,7 @@ export function PortfolioShell() {
         <VoicePrompt ready={ready} />
         <Subtitles />
         <HoloCard />
+        <AssistantDock />
         <Toasts />
         <TourBar />
         <EasterEggs />

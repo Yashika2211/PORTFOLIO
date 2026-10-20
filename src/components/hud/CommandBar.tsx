@@ -69,21 +69,6 @@ export function CommandBar() {
 
   return (
     <>
-      {/* Floating trigger (always visible; primary on mobile) */}
-      <button
-        type="button"
-        onClick={() => setCommandOpen(true)}
-        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-cyan/60 bg-void/80 text-cyan shadow-[0_0_24px_rgba(0,229,255,0.35)] backdrop-blur transition hover:scale-105 md:bottom-12 md:right-8"
-        aria-label={`Talk to ${assistant.name}`}
-        aria-haspopup="dialog"
-      >
-        <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="4" fill="currentColor" />
-          <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeOpacity="0.6" />
-          <circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" strokeOpacity="0.3" strokeDasharray="3 3" />
-        </svg>
-      </button>
-
       <AnimatePresence>
         {commandOpen && (
           <motion.div
