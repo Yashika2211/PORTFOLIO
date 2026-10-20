@@ -23,7 +23,15 @@ export type Action =
 
 export type Resolution = { intent: string; line: string; action: Action; confidence: number };
 
-export const SUGGESTIONS = ["show projects", "open Haggle", "take the tour", "skills in AI", "download resume", "surprise me"];
+export const SUGGESTIONS = [
+  "brief me",
+  "open Haggle",
+  "take the tour",
+  "compare Haggle and CodeNation",
+  "why should I hire her",
+  "run diagnostics",
+  "download resume",
+];
 
 // ---------- fuzzy helpers ----------
 export function normalize(s: string): string {
