@@ -26,6 +26,17 @@ export const micSupported = () => Ctor() !== null;
 
 let rec: Rec | null = null;
 let wantOn = false;
+/** Conversation mode: after an answer, follow-ups don't need the wake phrase for a while. */
+let followUntil = 0;
+let followTimer = 0;
+const FOLLOW_MS = 10_000;
+
+function openFollowUp() {
+  followUntil = Date.now() + FOLLOW_MS;
+  useYashu.getState().set({ followUp: true });
+  clearTimeout(followTimer);
+  followTimer = window.setTimeout(() => useYashu.getState().set({ followUp: false }), FOLLOW_MS);
+}
 
 function setListening(on: boolean) {
   signals.listening = on;
@@ -58,7 +69,10 @@ export function startListening(mode: "once" | "wake", onCommand: (text: string) 
         continue;
       }
       const { woke } = stripWake(transcript);
-      if (woke) onCommand(transcript);
+      if (woke || Date.now() < followUntil) {
+        onCommand(transcript);
+        openFollowUp();
+      }
     }
   };
   rec.onerror = (e) => {
@@ -92,6 +106,8 @@ export function startListening(mode: "once" | "wake", onCommand: (text: string) 
 
 export function stopListening() {
   wantOn = false;
+  followUntil = 0;
+  useYashu.getState().set({ followUp: false });
   try {
     rec?.stop();
   } catch {

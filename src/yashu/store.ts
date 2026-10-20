@@ -22,6 +22,8 @@ type State = {
   sound: boolean;
   micOn: boolean;
   listening: boolean;
+  /** Conversation mode window: follow-ups accepted without the wake phrase. */
+  followUp: boolean;
   gestures: boolean;
   overdrive: boolean;
   /** "go dark": dims ambient visuals and silences audio. */
@@ -104,6 +106,7 @@ export const useYashu = create<State & Actions>()(
       sound: false,
       micOn: false,
       listening: false,
+      followUp: false,
       gestures: false,
       overdrive: false,
       stealth: false,

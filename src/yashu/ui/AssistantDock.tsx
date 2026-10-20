@@ -68,12 +68,12 @@ const LABEL = { idle: "online", thinking: "processing", speaking: "speaking" } a
 
 /** Persistent assistant presence: state, reasoning steps, one-tap mic and the command bar. */
 export function AssistantDock() {
-  const { mode, steps, listening, setCommandOpen } = useYashu(
-    useShallow((s) => ({ mode: s.mode, steps: s.steps, listening: s.listening, setCommandOpen: s.setCommandOpen })),
+  const { mode, steps, listening, followUp, setCommandOpen } = useYashu(
+    useShallow((s) => ({ mode: s.mode, steps: s.steps, listening: s.listening, followUp: s.followUp, setCommandOpen: s.setCommandOpen })),
   );
   const [micOk, setMicOk] = useState(false);
   useEffect(() => setMicOk(micSupported()), []);
-  const state = listening ? "listening" : LABEL[mode];
+  const state = mode !== "idle" ? LABEL[mode] : followUp ? "go ahead" : listening ? "listening" : LABEL.idle;
 
   return (
     <div className="fixed bottom-4 right-4 z-[66] flex items-end gap-2 md:bottom-10 md:right-8">
