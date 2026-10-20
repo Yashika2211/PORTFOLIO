@@ -55,7 +55,16 @@ function PlainRender() {
 }
 
 export default function SceneRoot({ mobile, lowPower, animate }: { mobile: boolean; lowPower: boolean; animate: boolean }) {
-  const [tier, setTier] = useState<Tier>(mobile || lowPower ? 0 : 2);
+  const [tier, setTier] = useState<Tier>(() => {
+    // `localStorage["yashu:quality"] = "low"` pins the minimal tier (also used by e2e tests).
+    let pinnedLow = false;
+    try {
+      pinnedLow = window.localStorage.getItem("yashu:quality") === "low";
+    } catch {
+      /* storage blocked */
+    }
+    return mobile || lowPower || pinnedLow ? 0 : 2;
+  });
   const [visible, setVisible] = useState(true);
   const overdrive = useYashu((s) => s.overdrive);
   const briefing = useYashu((s) => s.openProject !== null);
