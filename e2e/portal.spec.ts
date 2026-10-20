@@ -11,7 +11,8 @@ test("case file portal opens, traps focus and returns it on close", async ({ pag
   await expect(dialog.getByText("106", { exact: true })).toBeVisible();
 
   await page.keyboard.press("Escape");
-  await expect(dialog).toBeHidden();
+  // The first click also arms the WebGL stage; software WebGL compiles starve the collapse animation.
+  await expect(dialog).toBeHidden({ timeout: 20_000 });
   await expect(card).toBeFocused();
 });
 
