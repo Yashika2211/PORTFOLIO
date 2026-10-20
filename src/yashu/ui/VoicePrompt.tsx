@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useYashu } from "../store";
-import { speakLine } from "../voice";
+import { primeSpeech, speakLine } from "../voice";
 import { greeting } from "../lines";
 
 /** First-visit opt-in: voice stays off until the visitor engages it. */
@@ -11,6 +11,8 @@ export function VoicePrompt({ ready }: { ready: boolean }) {
   const setVoice = useYashu((s) => s.setVoice);
 
   const choose = (on: boolean) => {
+    // Must run inside the click: iOS/Safari only allow speech started by a gesture.
+    if (on) primeSpeech();
     setVoice(on);
     // First-visit briefing: the highlights card plus one line on how to drive me.
     useYashu.getState().showCard({ kind: "briefing" });

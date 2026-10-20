@@ -7,6 +7,7 @@ import { useGitHub } from "@/lib/github";
 import { playSound } from "@/lib/sound";
 import { ACHIEVEMENTS } from "@/yashu/achievements";
 import { runCommand } from "@/yashu/commands";
+import { primeSpeech } from "@/yashu/voice";
 import { micSupported, startListening, stopListening } from "@/yashu/listen";
 import { useShallow } from "zustand/react/shallow";
 import { useYashu } from "@/yashu/store";
@@ -172,7 +173,24 @@ export function HudFrame() {
 
           <div className="flex items-center gap-2">
             <div className="hidden items-center gap-2 md:flex">
-              <Toggle on={voice === true} label="Voice" onClick={() => setVoice(voice !== true)} disabled={!ttsOk} />
+              <Toggle
+                on={voice === true}
+                label="Voice"
+                onClick={() => {
+                  if (voice !== true) primeSpeech();
+                  setVoice(voice !== true);
+                }}
+                disabled={!ttsOk}
+              />
+              <button
+                type="button"
+                onClick={() => set({ voiceSettings: true })}
+                className="-ml-1 rounded border border-cyan/30 px-1.5 py-1 font-mono text-[11px] text-muted transition hover:border-cyan hover:text-ink"
+                aria-label="Voice settings"
+                title="Voice settings"
+              >
+                ▾
+              </button>
               <Toggle on={sound} label="SFX" onClick={toggleSound} />
               <Toggle
                 on={gestures}
