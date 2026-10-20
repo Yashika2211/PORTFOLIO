@@ -47,7 +47,10 @@ function Effects({ tier }: { tier: Tier }) {
 
 /** Without post-processing, something still has to render the main scene before the Views. */
 function PlainRender() {
-  useFrame(({ gl, scene, camera }) => {
+  useFrame(({ gl, scene, camera, size }) => {
+    // drei <View>s leave the viewport set to their own rect; restore full-canvas first.
+    gl.setViewport(0, 0, size.width, size.height);
+    gl.setScissorTest(false);
     gl.autoClear = true;
     gl.render(scene, camera);
   }, 1);
@@ -106,7 +109,7 @@ export default function SceneRoot({ mobile, lowPower, animate }: { mobile: boole
         <CameraRig animate={animate} />
         {/* Space scene pauses (and post-processing drops) while the canvas sits above a briefing. */}
         <group visible={!briefing}>
-          <group position={mobile ? [0, -1.5, -1.5] : [2.1, 0, 0]}>
+          <group position={mobile ? [0, -2.2, -5] : [2.1, 0, 0]}>
             <ArcCore particles={CORE_PARTICLES[tier]} detail={tier === 2 ? 20 : 10} />
           </group>
           <Starfield count={PARTICLES[tier]} overdrive={overdrive} />
