@@ -3,7 +3,9 @@
 import { useMemo } from "react";
 import { getAudioContext, getVoiceAnalyser, startPump } from "./audio";
 import { signals } from "./signals";
+import { chunkSentences, toSpeech } from "./speech-text";
 import { useYashu } from "./store";
+import { femaleVoices, rankVoices } from "./voices";
 
 /**
  * Y.A.S.H.U.'s voice. Two providers behind one interface:
@@ -60,57 +62,134 @@ async function premiumAvailable(): Promise<boolean> {
 }
 
 // ---------- Browser provider ----------
-function pickVoice(): SpeechSynthesisVoice | undefined {
-  const voices = window.speechSynthesis.getVoices();
-  const score = (v: SpeechSynthesisVoice) =>
-    (/en[-_]IN/i.test(v.lang) ? 40 : /en[-_]GB/i.test(v.lang) ? 30 : /^en/i.test(v.lang) ? 10 : 0) +
-    (/natural|neural|premium|enhanced|google/i.test(v.name) ? 8 : 0) +
-    (v.localService ? 1 : 0);
-  return [...voices].sort((a, b) => score(b) - score(a))[0];
+type VoicePrefs = { name?: string; rate?: number };
+const PREFS_KEY = "yashu:voice:v1";
+
+export function getVoicePrefs(): VoicePrefs {
+  try {
+    return JSON.parse(localStorage.getItem(PREFS_KEY) ?? "{}") as VoicePrefs;
+  } catch {
+    return {};
+  }
+}
+export function setVoicePrefs(p: VoicePrefs) {
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify({ ...getVoicePrefs(), ...p }));
+  } catch {
+    /* ignore */
+  }
 }
 
-function speakBrowser(text: string): Promise<void> {
+/** speechSynthesis loads voices asynchronously; wait (briefly) until they exist. */
+export function loadVoices(timeout = 1500): Promise<SpeechSynthesisVoice[]> {
+  if (!("speechSynthesis" in window)) return Promise.resolve([]);
+  const synth = window.speechSynthesis;
+  const now = synth.getVoices();
+  if (now.length) return Promise.resolve(now);
   return new Promise((resolve) => {
-    if (!("speechSynthesis" in window)) return resolve();
-    const synth = window.speechSynthesis;
-    synth.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.pitch = 0.95;
-    u.rate = 1.02;
-    const v = pickVoice();
-    if (v) u.voice = v;
-
-    // speechSynthesis exposes no audio stream, so synthesize a speech-shaped
-    // envelope from word boundaries for the audio-reactive core.
-    let level = 0;
-    let raf = 0;
-    const tick = () => {
-      level *= 0.9;
-      signals.voiceLevel = Math.max(0.12, level) * (0.8 + Math.random() * 0.4);
-      for (let b = 0; b < 16; b++) signals.bands[b] = signals.voiceLevel * (0.4 + 0.6 * Math.abs(Math.sin(performance.now() / 90 + b)));
-      raf = requestAnimationFrame(tick);
-    };
     const done = () => {
-      cancelAnimationFrame(raf);
-      signals.speaking = false;
-      signals.voiceLevel = 0;
-      signals.bands.fill(0);
-      resolve();
+      synth.removeEventListener("voiceschanged", done);
+      clearInterval(poll);
+      clearTimeout(timer);
+      resolve(synth.getVoices());
     };
-    u.onstart = () => {
-      signals.speaking = true;
-      raf = requestAnimationFrame(tick);
-    };
-    u.onboundary = () => (level = 0.7 + Math.random() * 0.3);
-    u.onend = done;
-    u.onerror = done;
-    current = { stop: () => synth.cancel() };
-    synth.speak(u);
+    synth.addEventListener("voiceschanged", done);
+    const poll = window.setInterval(() => synth.getVoices().length && done(), 100);
+    const timer = window.setTimeout(done, timeout);
   });
 }
 
+/** Female voices available on this device, best first. */
+export async function listFemaleVoices() {
+  return femaleVoices(await loadVoices());
+}
+
+function chooseVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
+  const { name } = getVoicePrefs();
+  const picked = name ? voices.find((v) => v.name === name) : undefined;
+  return picked ?? femaleVoices(voices)[0] ?? rankVoices(voices)[0];
+}
+
+/**
+ * iOS/Safari only allow speech that starts inside a user gesture. Call this
+ * synchronously from the click that enables voice; later lines then play.
+ */
+export function primeSpeech() {
+  getAudioContext();
+  if (!("speechSynthesis" in window)) return;
+  const u = new SpeechSynthesisUtterance(" ");
+  u.volume = 0;
+  window.speechSynthesis.speak(u);
+}
+
+async function speakBrowser(text: string, opts: { voiceName?: string } = {}): Promise<void> {
+  if (!("speechSynthesis" in window)) return;
+  const synth = window.speechSynthesis;
+  const voices = await loadVoices();
+  const voice = opts.voiceName ? voices.find((v) => v.name === opts.voiceName) : chooseVoice(voices);
+  const rate = getVoicePrefs().rate ?? 1;
+  const chunks = chunkSentences(toSpeech(text));
+  synth.cancel();
+  let cancelled = false;
+  current = {
+    stop: () => {
+      cancelled = true;
+      synth.cancel();
+    },
+  };
+
+  // speechSynthesis exposes no audio stream, so synthesize a speech-shaped
+  // envelope from word boundaries for the audio-reactive core.
+  let level = 0;
+  let raf = 0;
+  const tick = () => {
+    level *= 0.9;
+    signals.voiceLevel = Math.max(0.12, level) * (0.8 + Math.random() * 0.4);
+    for (let b = 0; b < 16; b++) signals.bands[b] = signals.voiceLevel * (0.4 + 0.6 * Math.abs(Math.sin(performance.now() / 90 + b)));
+    raf = requestAnimationFrame(tick);
+  };
+  // Chrome stalls long speech queues unless nudged.
+  const keepAlive = window.setInterval(() => synth.speaking && !synth.paused && synth.resume(), 9000);
+
+  signals.speaking = true;
+  raf = requestAnimationFrame(tick);
+  try {
+    for (const chunk of chunks) {
+      if (cancelled) break;
+      await new Promise<void>((resolve) => {
+        const u = new SpeechSynthesisUtterance(chunk);
+        if (voice) {
+          u.voice = voice;
+          u.lang = voice.lang;
+        }
+        u.rate = rate;
+        u.pitch = 1;
+        u.onboundary = () => (level = 0.7 + Math.random() * 0.3);
+        u.onend = () => resolve();
+        u.onerror = () => resolve();
+        // Safety net: some engines never fire onend.
+        window.setTimeout(resolve, 1500 + chunk.length * 110);
+        synth.speak(u);
+      });
+    }
+  } finally {
+    clearInterval(keepAlive);
+    cancelAnimationFrame(raf);
+    signals.speaking = false;
+    signals.voiceLevel = 0;
+    signals.bands.fill(0);
+  }
+}
+
+/** Speak a sample line in a given voice (voice picker preview). */
+export function previewVoice(name: string) {
+  primeSpeech();
+  void speakBrowser("Hello. I'm Yashu, Yashika's assistant. This is how I'll sound.", { voiceName: name });
+}
+
 // ---------- Premium provider ----------
-async function speakPremium(text: string): Promise<boolean> {
+async function speakPremium(line: string): Promise<boolean> {
+  const text = toSpeech(line);
   const c = getAudioContext();
   const analyser = getVoiceAnalyser();
   if (!c || !analyser) return false;
