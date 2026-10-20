@@ -136,7 +136,11 @@ export async function runCommand(input: string, source: "typed" | "voice" = "typ
   }
   await think(r.steps);
   if (r.focus !== undefined) useYashu.getState().set({ focus: r.focus });
-  if (r.card) useYashu.getState().showCard(r.card);
+  if (r.card) {
+    useYashu.getState().showCard(r.card);
+    // Small screens: the command bar steps aside so the answer card is readable.
+    if (window.matchMedia("(max-width: 639px)").matches) useYashu.getState().setCommandOpen(false);
+  }
   void speakLine(r.line);
   perform(r.action);
   return r.line;
