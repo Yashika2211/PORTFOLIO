@@ -24,6 +24,10 @@ type State = {
   listening: boolean;
   /** Conversation mode window: follow-ups accepted without the wake phrase. */
   followUp: boolean;
+  /** Live (interim) transcript while listening. */
+  heard: string;
+  /** Last speech-recognition problem, with a fix. */
+  micError: string | null;
   gestures: boolean;
   overdrive: boolean;
   /** "go dark": dims ambient visuals and silences audio. */
@@ -109,6 +113,8 @@ export const useYashu = create<State & Actions>()(
       micOn: false,
       listening: false,
       followUp: false,
+      heard: "",
+      micError: null,
       gestures: false,
       overdrive: false,
       stealth: false,

@@ -2,11 +2,9 @@
 
 import { signals } from "./signals";
 
-/** One shared AudioContext for voice, mic analysis and UI sound design. */
+/** One shared AudioContext for voice analysis and UI sound design. (Mic level comes from the recogniser — see listen.ts.) */
 let ctx: AudioContext | null = null;
 let voiceAnalyser: AnalyserNode | null = null;
-let micAnalyser: AnalyserNode | null = null;
-let micStream: MediaStream | null = null;
 let raf = 0;
 
 export function getAudioContext(): AudioContext | null {
@@ -34,7 +32,6 @@ export function getVoiceAnalyser(): AnalyserNode | null {
 }
 
 const freq = new Uint8Array(128);
-const wave = new Uint8Array(256);
 
 /** Per-frame pump: copies analyser data into `signals` for the shaders. */
 function pump() {
@@ -50,37 +47,9 @@ function pump() {
     }
     signals.voiceLevel = Math.min(1, (sum / 16) * 2.2);
   }
-  if (micAnalyser && signals.listening) {
-    micAnalyser.getByteTimeDomainData(wave);
-    let peak = 0;
-    for (let i = 0; i < wave.length; i++) peak = Math.max(peak, Math.abs(wave[i] - 128));
-    signals.micLevel = Math.min(1, peak / 64);
-  }
   raf = requestAnimationFrame(pump);
 }
 
 export function startPump() {
   if (!raf && typeof window !== "undefined") raf = requestAnimationFrame(pump);
-}
-
-/** Open the mic for level analysis only (audio never leaves the device). */
-export async function openMicAnalyser(): Promise<void> {
-  const c = getAudioContext();
-  if (!c || micStream || !navigator.mediaDevices?.getUserMedia) return;
-  try {
-    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    micAnalyser = c.createAnalyser();
-    micAnalyser.fftSize = 512;
-    c.createMediaStreamSource(micStream).connect(micAnalyser);
-    startPump();
-  } catch {
-    micStream = null;
-  }
-}
-
-export function closeMicAnalyser() {
-  micStream?.getTracks().forEach((t) => t.stop());
-  micStream = null;
-  micAnalyser = null;
-  signals.micLevel = 0;
 }
