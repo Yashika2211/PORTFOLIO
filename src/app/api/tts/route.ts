@@ -4,6 +4,7 @@ import { clientIp, rateLimit, readText } from "@/lib/rateLimit";
 /**
  * Optional premium voice for Y.A.S.H.U.
  * Env (server-only): TTS_PROVIDER = "elevenlabs" | "openai", TTS_API_KEY, optional TTS_VOICE.
+ * Defaults are female voices: ElevenLabs "Rachel", OpenAI "nova" with a style instruction.
  * Without a key, GET reports disabled and the client silently uses speechSynthesis.
  */
 const provider = process.env.TTS_PROVIDER?.toLowerCase();
@@ -22,8 +23,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "rate limited" }, { status: 429, headers: { "retry-after": String(limit.retryAfter) } });
   }
 
-  const text = await readText(req, "text", 400);
-  if (!text) return NextResponse.json({ error: "text must be 1–400 chars" }, { status: 400 });
+  const text = await readText(req, "text", 1000);
+  if (!text) return NextResponse.json({ error: "text must be 1–1000 chars" }, { status: 400 });
 
   const signal = AbortSignal.timeout(12_000);
   try {
@@ -43,7 +44,14 @@ export async function POST(req: Request) {
             method: "POST",
             signal,
             headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
-            body: JSON.stringify({ model: "gpt-4o-mini-tts", voice: process.env.TTS_VOICE || "sage", input: text, response_format: "mp3" }),
+            body: JSON.stringify({
+              model: "gpt-4o-mini-tts",
+              voice: process.env.TTS_VOICE || "nova",
+              input: text,
+              instructions:
+                "Voice of a calm, confident, warm female AI assistant with a light Indian-English accent. Crisp articulation, natural pacing, a hint of dry wit. Never robotic.",
+              response_format: "mp3",
+            }),
           });
 
     if (!upstream.ok || !upstream.body) {
