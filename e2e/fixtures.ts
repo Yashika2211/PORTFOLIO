@@ -5,6 +5,8 @@ export const test = base.extend<{ page: Page }>({
   page: async ({ page }, use) => {
     await page.addInitScript(() => {
       localStorage.setItem("yashu:booted:v1", "1");
+      // Software WebGL in CI is slow; start the scene on its minimal tier.
+      localStorage.setItem("yashu:quality", "low");
       localStorage.setItem(
         "yashu:state:v1",
         JSON.stringify({ state: { voice: false, sound: false, visited: [], opened: [], lastProject: null, lastVisit: null, achievements: [] }, version: 0 }),

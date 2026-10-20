@@ -26,8 +26,9 @@ test.describe("command bar intents", () => {
   test("'open Haggle' opens the Haggle mission briefing", async ({ page }) => {
     await ask(page, "open Haggle");
     const briefing = page.getByRole("dialog", { name: "Haggle" });
-    await expect(briefing).toBeVisible({ timeout: 8000 });
-    await expect(briefing.getByText("Mandate Firewall", { exact: false })).toBeVisible();
+    // Generous: headless software WebGL compiles the briefing's shaders on the CPU.
+    await expect(briefing).toBeVisible({ timeout: 20_000 });
+    await expect(briefing.getByText(/HMAC-signed mandates/)).toBeVisible();
   });
 
   test("'show projects' navigates to the case files", async ({ page }) => {

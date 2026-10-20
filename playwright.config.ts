@@ -5,6 +5,7 @@ const PORT = 3200;
 export default defineConfig({
   testDir: "./e2e",
   timeout: 45_000,
+  expect: { timeout: 12_000 },
   retries: process.env.CI ? 1 : 0,
   // Software WebGL is CPU-heavy; more parallel workers starve each page.
   workers: 2,
